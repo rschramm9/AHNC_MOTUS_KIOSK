@@ -39,23 +39,6 @@ projects home directory when you downloaded the source code. Look for the file
 or find it at https://motus.org/policy/
 
 
-
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review> New Project and select 
-* Other guidelines
-
 ### Who do I talk to? ###
 
 * Owner Richard Schramm - schramm.r@gmail.com
