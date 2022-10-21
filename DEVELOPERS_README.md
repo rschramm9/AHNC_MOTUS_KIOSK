@@ -1,9 +1,10 @@
 # Developers Notes
 
 
-### Ankeney Hill Nature Center MOTUS Kiosk ###
-A collection of notes by the author to accompany the kiosk project to assist future
- developers and maintainers of the kiosk software (and remind me what I did and why)
+### Ankeny Hill Nature Center MOTUS Kiosk ###
+This document is a collection of notes, ramblings, code snippets, problems encountered, future 'to do list' etc by the author to remind me what I did and why.    While mostly to assist me I include it in the project repo as possibly future developers and maintainers of the kiosk software might benefit.
+
+Also is a guide on how to get the build tools installed, the kiosk app out of source control (git), and how to do the first build.
 
 
 ### Who do I talk to? ###
@@ -66,7 +67,7 @@ See: https://openkiosk.mozdevgroup.com
 The OpenKiosk is a basically a browser with configurable restrictions that will host our application. In
 particular, see the 'Help' tab on that page.
 
-##### The programing/language environment
+##### The programming/language environment
 
 Many language environments offer web dashboard-like frameworks.  The Motus users are heavily
 invested in R. Initial thinking was we would need to use the Motus R package to access
@@ -81,6 +82,10 @@ public "Basic open-access dataset". That dataset is the coarse "summary-level de
 Since all of the desired information was available via simple http requests to the public motus.org servers which we can then 'scrape' data from the returns .  We do not really need the Motus R package.  This does expose the kiosk app  to 'breakage' if folks at motus.org significantly change their web site.
 
 Development continued in R as significant progress had been made on the dashboard. It is hoped that the Motus team will eventually provide a stable published API call to the "summary-level detection information" dataset we need.
+
+##### The multi-language support
+
+For multi-language support this app uses the i18n package to perform language translations see:https://github.com/Appsilon/shiny.i18n and also the article:  https://www.linkedin.com/pulse/multilanguage-shiny-app-advanced-cases-eduard-parsadanyan/
 
 ##### The Application
  The application is built in R-Studio using the R package "Shiny" (see: https://shiny.rstudio.com/)
@@ -132,29 +137,65 @@ Resolving deltas: 100% (4/4), done.
 
 A complete copy of the repository should now be in subdirectory at: C:\Users\MOTUS_KIOSK\Projects\AHNC_MOTUS_KIOSK
 
-Run R-Studio IDE
-Click File > New Project 
+Your first run....
 
-From pop-up, choose "Existing Directory" and navigate to the AHNC_MOTUS_KIOSK directory, then click 'Create Project' button.
+Now run the R-Studio IDE. Once open, Click File > New Project 
 
-From the project window right s
+File > New Project. From NewProjectWizard  select “Existing Directory”
 
+“Browse”  **INTO** the folder: C:\Users\MOTUS_KIOSK\Projects\AHNC_MOTUS_KIOSK and click “Open”
 
+Back in the wizard, Click “Create Project”
 
+ From the IDE  Right-side  “Files” Panel,  click to open file global.R
 
+Check at the top of the code window for a warning regarding several packages that need to be installed… Go ahead and click the “Install”  Wait while it installs numerous package dependencies. This can take around 4 to 5 minutes….
+
+ Repeat the above check for packages needing to be installed as needed for files:
+
+ui.R
+
+server.R
+
+modules/receiverDeploymentDetections.R
+
+modules/ReceiverDetections.R
+
+modules/tagDeploymentDetails.R
+
+modules/tagDeploymentDetections.R
+
+ 
+
+Close the tabs for all source code files **EXCEPT**  global.R, ui.R and server.R
+
+With one of those three files selected for view in the code window, notice the green arrow labeled “Run App”. Click that. After RStudio builds the app it should pop-up the app in its own browser window. 
+
+Two other things to note...
+
+1-When the app is running - on the Console tab will be a red stop-sign. Use that to halt the app to make changes or reload the config file etc
+
+2-Just after the app starts up, if you scroll down thru the output in the Console tab, you will find:
+
+"Listening on http://127.0.0.1:####". This is the temporary URL and port that Shiny assigns.  You may be curious to try cutting that URL to your clipboard and pasting it into any browser on any machine on your local network.  It should work!
 
 #### Configuration ####
 
-See file kiosk.cfg in the projects top-level directory.  It contain key value pairs
-that do things like set the target motus receiver using its Motus database ID
+See file kiosk.cfg in the project's top-level directory.  It contains key value pairs
+that do things like set the target motus receiver using its Motus database ID. You probably want to point the app to your own receiver instead of ours!
+
+To locate  your receiver's ID:  Go to motus.org Then : ExploreData>Projects
+
+Find your ProjectID, then click on the link that takes you to your project's description.  Look for the item named "Receivers" and click the link next to it saying ""(Table)"
+
+Edit. the kiosk.cfg file using your information.
+
 ```code
 ReceiverID=7948
 MainLogoFile="images/logos/ankenyhill_logo.png"
 MainLogoHeight=140
 MainTitle="Test Data"
 ```
-
-
 
 
 
