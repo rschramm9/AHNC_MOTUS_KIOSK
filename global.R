@@ -72,8 +72,48 @@ default_UI_lang <- "en"
 
 ###### read configuration key/value pairs
 library(data.table)
-configfrm <- read.table(file='kiosk.cfg',header=FALSE,
-                        sep='=',col.names=c('Key','Value'))
+tryCatch( 
+  {  
+    #attempt to read file from current directory
+    # use assign so you can access the variable outside of the function
+    assign("configfrm", read.table(file='kiosk.cfg',header=FALSE,
+                                   sep='=',col.names=c('Key','Value')), envir=.GlobalEnv) 
+    print("Loaded installation data from local storage")
+  },
+  warning = function( w )
+  {
+    print()# dummy warning function to suppress the output of warnings
+  },
+  error = function( err ) 
+  {
+    print("Could not read cfg data from current directory, using defaults...")
+    
+    #attempt to read from alternate template
+    tryCatch(
+      {
+        # use assign so you can access the variable outside of the function
+        #attempt to read file from current directory
+        # use assign so you can access the variable outside of the function
+        assign("configfrm", read.table(file='sample.cfg',header=FALSE,
+                                       sep='=',col.names=c('Key','Value')), envir=.GlobalEnv) 
+        print("Loaded installation data from sample template")
+      },
+      warning = function( w )
+      {
+        print()# dummy warning function to suppress the output of warnings
+      },
+      error = function( err )
+      {
+        print("Could not load configuration data. Exiting Program")
+      }
+    )
+    
+    
+  })
+
+
+#configfrm <- read.table(file='kiosk.cfg',header=FALSE,
+#                        sep='=',col.names=c('Key','Value'))
 
 #print("******* configfrm **********")
 #str(configfrm)
