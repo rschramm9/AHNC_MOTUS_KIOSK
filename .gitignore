@@ -45,4 +45,5 @@ vignettes/*.pdf
 #rsconnect for Shinyapps.io
 rsconnect/
 
-
+#the local kiosk.cfg file
+kiosk.cfg
