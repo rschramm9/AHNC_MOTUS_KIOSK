@@ -8,6 +8,9 @@ This project creates a public display or "kiosk"" for a Motus receiver station f
 
 The Motus Wildlife Tracking System (Motus) is an international collaborative research network that uses coordinated automated radio telemetry to facilitate research and education on the ecology and conservation of migratory animals. Motus is a program of Birds Canada in partnership with collaborating researchers and organizations. Learn more at https://motus.org
 
+![Figure1](md_images/RM_KioskHomepage.png)
+*Figure 1 - Kiosk home page*
+
 ###  Acknowledgements and Restrictions on Data Use or Publication
 
 ***Any use or publication of the data presented through this application must***
