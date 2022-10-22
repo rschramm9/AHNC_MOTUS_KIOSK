@@ -50,5 +50,7 @@ Owner Richard Schramm - schramm.r@gmail.com
 
 ### Where to Start?
 
-See **GETTING_STARTED_README.md** in the project's top level directory.
+See **WINDOWS_FIRSTRUN_README.md** in the project's top level directory. 
+
+Alternately, if you want to skip all of the Windows and kiosk-specific setup and just play with the app in R, see BUILDING_THE_APP_README.md
 
