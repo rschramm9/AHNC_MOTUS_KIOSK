@@ -84,11 +84,11 @@ I dont like to expose this password discovery mechanism on a computer that may h
 5. Select ‘OK’
 
 
-#### Main 5.0 - Remove “Microsoft OneDrive” 
+#### Main 5.0 - Remove “Microsoft OneDrive”  (Optional)
 
 ControlPanel>Programs>UnistallProgram
 
-#### Main 6.0 - Customize Microsoft Edge
+#### Main 6.0 - Customize Microsoft Edge (Optional)
 
 The first time you run Microsoft's default Edge browser it goes through several windows that attempt to sign you up for a bunch of services and features we do not need or want.  Go ahead and open Edge and be careful on those first few screens.  It is completely ok to select No Thanks to everything and to 'Proceed without this data' etc.
 
@@ -104,7 +104,7 @@ The first time you run Microsoft's default Edge browser it goes through several 
 
 - Exit Edge when done 
 
-- Open Chrome by double-clicking the desktop icon, *then set it as the default browser*.
+- Open Chrome by double-clicking the desktop icon, ***then set it as the default browser***.
 
 
 #### Main 8.0 - Install Firefox Browser
@@ -189,9 +189,9 @@ Eventually it will pop-up the “Choose privacy settings” page. Deselect all o
 
 It is important that user MOTUS_KIOSK have properly configured screen saver timeouts and notification setting as we want the Kiosk to manage itself unattended.
 
-As user=MOTUS_KIOSK clean up desktop, set screen saver correctly, turn off notifications etc 
+As user=MOTUS_KIOSK clean up desktop, set screen saver correctly, turn off notifications etc I recommend you follow  "Appendix 1. Common Cleanup"  completely.
 
-Follow  "Appendix 1. Common Cleanup" 
+***As a minimum you should perform step in Appendix 1 Sections 1.5 and 1.7 for MOTUS_KIOSK***
 
 #### Main 16.0 - Install SSH (Optional)
 
@@ -219,15 +219,13 @@ Choose the account "User"
 
 Then choose either 'Create Password' or 'Delete the account'
 
-####  --- Congratulations - You have completed Windows FirstRun setup  -----
-
-#### ---- Proceed to the second doc - BUILDING_THE_APP_README.md
+####  Congratulations - You have completed Windows FirstRun setup. Proceed to the second doc - BUILDING_THE_APP_README.md
 
 
 
 ## Appendix 1 – Common Cleanup for new user account
 
- I recommend cleaning off all of the mostly distracting and useless bloat that Microsoft puts on user toolbars and Desktop.  I also put shortcut to commonly need applications onto the taskbar and Start menu so I dont have to search for them.  *All of this steps are optional.* 
+***All of these steps are optional.***  I recommend cleaning off all of the mostly distracting and useless bloat that Microsoft puts on user toolbars and Desktop.  I also put shortcut to commonly need applications onto the taskbar and Start menu so I dont have to search for them.  
 
 #### A1.1. Pin commonly needed tasks to Startup menu and/or Taskbar
 
@@ -304,17 +302,17 @@ On the TaskBar at lower-right, hover over ‘meet now’ camera icon, r-click an
 
 \- Right click MicrosoftEdge icon on taskbar and select unpin from taskbar
 
-\-    Right click MicrosoftStore on taskbar and select unpin from taskbar
+\- Right click MicrosoftStore on taskbar and select unpin from taskbar
 
-\-    Right click Mail the (envelope) on taskbar and select unpin from taskbar
+\- Right click Mail the (envelope) on taskbar and select unpin from taskbar
 
-- Hide the ‘MeetNow’ icon in taskbar if present 
+\- Hide the ‘MeetNow’ icon in taskbar if present 
 
-a.   navigate to **Settings** → **Personalization** → **Taskbar**.
+​	a.   navigate to **Settings** → **Personalization** → **Taskbar**.
 
-b.   	In the 'Notification area' section click on the hypertext option **"Turn system icons on or off"  **
+​	b.   In the 'Notification area' section click on the hypertext option **"Turn system icons on or off"  **
 
-c.   	Locate the **Meet Now** and toggle setting to the off position. 
+​	c.   Locate the **Meet Now** and toggle setting to the off position. 
 
  
 
@@ -340,7 +338,7 @@ d.  Regardless of your choice to keep or turn off - I recommend  turn off at lea
 
  Select Start, then select Settings
 
-a. In Settings > Privacy > General.  Turn off the following options:
+In Settings > Privacy > General.  Turn off the following options:
 
 * Let windows track app launches
 
@@ -374,8 +372,6 @@ In Settings >  Personalization > Lockscreen
   * Click "Apply" and then "OK"
   
 ####  -------  You have reached the end of Appendix 1 -----
-
-
 
 
 

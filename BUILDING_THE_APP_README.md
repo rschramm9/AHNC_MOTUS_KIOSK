@@ -19,7 +19,7 @@ If you are wanting to modify or further develop the application there is a fouth
 
 * Owner/Originator:  Richard Schramm - schramm.r@gmail.com
 
-### Preliminaries ###
+### 1.0 - Preliminaries ###
 
 The 'kiosk system' can be viewed as built on these .
 
@@ -61,29 +61,64 @@ All of the desired tagged bird detection information is available via simple htt
  You can host standalone apps on a webpage or build dashboards. When run on the local machine
  from a cmd line it will start a 'shiny server' on a local machine URL that you can point your browser to.
 
-### How do I get started? ###
 
-##### Install R for your platform
+
+##### 2.0 - Install R for your platform
 
 If not already done. (see: https://www.r-project.org/)
 
-##### Install R-studio IDE Free Edition for your platform
+##### 3.0 - Install R-studio IDE Free Edition for your platform
 
 If not already installed.  (see:https://www.rstudio.com/products/rstudio/download/)
 
-##### Create the user account
+As user=Admin
+
+Run R-Studio
+
+Enter the following cmds into the RSstudio Console just to make sure all are installed for the Admin user:
+
+```
+install.packages("shiny")
+install.packages("shinymeta")
+install.packages("shinyjs")
+install.packages("shiny.i18n")
+install.packages("shinyWidgets")
+install.packages("rvest")
+install.packages("tidyr")
+install.packages("lubridate")
+install.packages("sf")
+install.packages("rgdal")
+install.packages("raster")
+install.packages("ggplot2")
+install.packages("rgeos")
+install.packages("mapview")
+install.packages("broom")
+install.packages("tidyverse")
+install.packages("DT")
+
+```
+
+
+
+##### 4.0 - Create the user account
 
 This and all other accompanying documentation assumes a particular Windows10 user account (username=MOTUS_KIOSK) and project directory structure: C:\Users\MOTUS_KIOSK\Projects
 
 While you may use any account to get the web app dashboard up-and-running - you will save yourself needing to repeat some of this work if you do it within the username and home directory on the local machine that you intend to deploy on.
 
-##### Get the code
+##### 5.0 - Get git
 
 Presumably if you are viewing this file you have this part figured out.  If not - the project and code is available on a github repository.  You will need a github account to clone the repository.
 
-You will first need to install git on the machine you wish to download the project to. (See: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+You will first (as administrator) need to install git on the machine you wish to download the project to. (See: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-Create a directory for the project - for example on Windows I use C:\Users\MOTUS_KIOSK\Projects as my top-level directory
+##### 6.0 - Get the code
+
+As user = MOTUS_KIOSK
+
+Create a directory for the project - for example on Windows I use **C:\Users\MOTUS_KIOSK\Projects** as my top-level directory. If you dont already have the Projects folder - create it now as User=MOTUS_KIOSK
+
+Ankeny7029
 
 Open a command window such as Cmd.exe and type:
 
@@ -107,7 +142,7 @@ Resolving deltas: 100% (4/4), done.
 
 A complete copy of the repository should now be in subdirectory at: C:\Users\MOTUS_KIOSK\Projects\AHNC_MOTUS_KIOSK
 
-##### Your first build
+##### 7.0 - Your first build
 
 Run the R-Studio IDE.  Once open, Click File > New Project 
 
@@ -162,15 +197,15 @@ Two other things to observe...
 
 "Listening on http://127.0.0.1:####". This is the temporary URL server and port that Shiny assigns.  You may be curious to try cutting that URL to your clipboard and pasting it into any browser on any machine on your local network.  It should work!
 
-#### Configuration ####
+#### 8.0 - Configuration ####
 
-##### Locate your site's motus receiver ID.
+##### 8.1 - Locate your site's motus receiver ID.
 
 To locate  your receiver's ID:  Go to motus.org Then : ExploreData>Projects
 
 Find your ProjectID, then click on the link that takes you to your project's description.  Look for the item named "Receivers" and click the link next to it saying ""(Table)"
 
-##### Make your own configuration file using your receiver ID.
+##### 8.2 - Make your own configuration file using your receiver ID.
 
 In the project's top-level directory is a file called sample.cfg  It contains the default set of key value pairs
 that do things like set the target motus receiver using its Motus database ID.
@@ -192,7 +227,7 @@ MainTitle="Test Data"
 
 
 
-##### Configure your own "Home" tab content
+##### 8.3 - Configure your own "Home" tab content
 
 The descriptive content that appears in the in the main page body when ever the "Home" tab is open comes from a language dependent .html file in the  project sub-directory www/docs.
 
@@ -208,4 +243,3 @@ Someplace visible in your kiosk you *must* give proper credit to the Motus folks
 
 **WARNING:** Teaching html document structure is beyond the scope of this documentation.  Be careful to maintain correct opening and closing html tags and verify that your changes render correctly in an html browser such as firefox or chrome before replacing the existing files.
 
-R St

@@ -44,9 +44,9 @@ This and all other accompanying documentation assumes a particular Windows10 use
 
 It is assumed here that you are now able to run the AHNC_MOTUS_KIOSK project in R-Studio running on your target machine and the project has been downloaded from github resides in the above directory belonging to the MOTUS_KIOSK user.
 
-#### Install OpenKiosk on your platform.
+#### 1.0 - Install OpenKiosk on your platform.
 
-* *Read and note this before proceeding:*
+* *Read this warning this before proceeding:*
 
 ```
 When open kiosk runs it may appear to lock you out of viewing other windows (including possibly this document! Have you got a pencil handy? The secret to unlock:
@@ -68,12 +68,18 @@ Go to C:\Program Files and run OpenKiosk by double-clicking it – It will run i
 
 Shift F1 puts administrator login banner up in the upper-left. Enter ‘admin’ as the password.
 
-While on the admin page, select "OpenKiosk" selector on the sidebar panel.
+While on the admin page:
+
+Select "Home" selector on the sidebar panel.
+
+* Set "Homepage and new windows" to "localhost:8081" 
+
+Select "OpenKiosk" selector on the sidebar panel.
 
 Verifiy Settings are:
 
 - "Enable Attract Screen" False (unchecked box)
-- ~~"Enable Full Screen" False (unchecked box) << that is not a mistake - it should be set false~~
+- "Enable Full Screen" True (checked box) http://
 - "Enable Redirect Screen" False (unchecked box)
 - "Enable URL Filters" False (unchecked box)
 - Set homepage to : localhost:8081  << this port must agree with the shiny app startup task we will create in next section!
@@ -92,19 +98,19 @@ Verifiy Settings are:
 
 
 
-#### Set the shiny kiosk app to run at at boot
+#### 2.0 - Set the shiny App.R local web server to run at at boot
 
-Shiny kiosk App.R is the background server application needed by the kiosk web pages. So we want it to start at boot so it’s there and ready whenever the kiosk gui is displayed by OpenKiosk (eg.when ever the motus_kiosk user logs in)
+Shiny kiosk App.R is the background server application needed by the kiosk web pages. So we want it to start at boot so it’s running and ready whenever the kiosk gui is displayed by OpenKiosk (eg.when ever the motus_kiosk user logs in)
 
-·   Login as administrator Admin
+**2.1** - Login as administrator Admin
 
-.   Right-click the TaskScheduler icon and choose "Run as administrator"
+**2.2** - Right-click the TaskScheduler icon and choose "Run as administrator"
 
-·   In TaskScheduler - Highlight "Task Scheduler Library" on the right side panel
+**2.3** - In TaskScheduler - Highlight "Task Scheduler Library" on the right side panel
 
-·   In TaskScheduler Main Menubar:  Action > Create Task 
+**2.4** - In TaskScheduler Main Menubar:  Action > Create Task 
 
-·   - On the "General" tab
+**2.5** - On the "General" tab
 
 .			-  The task will be named MOTUS_KIOSK_SERVER
 
@@ -112,7 +118,7 @@ Shiny kiosk App.R is the background server application needed by the kiosk web p
 
 ·   		-	Check that it is set to run under the Admin account.
 
-·   - On the "Triggers" tab
+**2.6** - On the "Triggers" tab
 
 ·   		- Click "New" button and then set "Begin the task" to run at “Startup”
 
@@ -120,7 +126,7 @@ Shiny kiosk App.R is the background server application needed by the kiosk web p
 
 ·   		- Press "OK" button for the trigger.
 
-·   - On the "Actions" tab
+**2.7** - On the "Actions" tab
 
 ·   		- Click "New" button and then set  it’s Action to be “Start a  Program”
 
@@ -128,86 +134,86 @@ Shiny kiosk App.R is the background server application needed by the kiosk web p
 
 ​			 “C:\Program Files\R\R-4.2.1\bin\R.exe”    (or which ever installed  version of R is) and select it
 
-. 		**>>> Verifiy** the Browse function filled in the Program/script field with the surrounding double-quotes as shown above
+.			- Verify that the 'Browse' function filled in the Program/script field with the surrounding double-quotes as shown *above*
 
-·   		-Now fill the the Action "Add arguments" field as written below (with quotes as shown):  Note the port number selected must match the OpenKiosk default homepage set in previous section.
+.			- Now fill the the Action "Add arguments" field as written below (with quotes as shown):  Note the port number selected must match the OpenKiosk default homepage set in previous section.
 
 ```code
--e “options(shinys.port)=8081;shiny::runApp(‘C:/Users/MOTUS_KIOSK/Projects/AHNC_MOTUS_KIOSK’)
+-e “shiny::runApp(‘C:/Users/MOTUS_KIOSK/Projects/AHNC_MOTUS_KIOSK’,)
 ```
 
-·   		- Press "OK"  for the action button.
+.			- Press "OK"  for the action button.
 
-·   - On the "Settings" tab
+**2.8** - On the "Settings" tab
 
 ·   		- Uncheck the box "Stop the task if it runs longer than x days"
 
-Click the final "OK" and Windows will ask you for the Admin account password, then create the task. 
+**2.9** - Click the final "OK" and Windows will ask you for the Admin account password, then create the task. 
 
-**TODO::::::::::::::::   Test:**
+**2.10** - From within the taskManager , highlight the MOTUS_KIOSK_SERVER task, right-click and select run. Then open Crome or Firefox and browse to:  http:://localhost:8081 - the kiosk app should be displayed in the browser.
 
-**Use task manager to manually run task SHINEY_KIOSK**
+**2.11** - If you are able to get the Kiosk dashboard to display in a Web browser,  shutdown and reboot the PC. Then retest by pointing your web browser again to localhost:8081
 
-**Then browse to:  http:://localhost:8081**
+Note that on a slow PC, sometimes it takes a few moment for the server to fully start.  Your browser may say it failed to connect, wait perhaps 5-10 seconds and retry.)
 
-**Reboot then repeat the browse to:  http:://localhost:8081**
+**2.12** - At this point you hopefully have a kiosk server that auto-starts whenever the PC is booted.
+
+**TROUBLE SHOOTING:** If the browser doesnt display the dashboard. Try opening a Cmd.exe window and R-Studio side-by-side. In the command window type the full command below all as a single line:
+
+```
+“C:\Program Files\R\R-4.2.1\bin\R.exe” -e “shiny::runApp(‘C:/Users/MOTUS_KIOSK/Projects/AHNC_MOTUS_KIOSK’,port=8081)"
+```
+
+View the command output for hints to the error - sometimes it has been a failed package load and there will be a message like "No package xxxx not found".  This can usually be cleared by typing install.package("xxxx") in the RStudio console.  (See also the BUILDING_THE_APP_README.md Section 3.0)
+
+Once you are able to get the Kiosk dashboard to display in a Web browser,  shutdown and reboot the PC. Then point your web browser again to localhost:8081
+
+(Note that on a slow PC, sometimes it takes a few moment for the server to fully start.  Your browser may say it failed to connect, wait perhaps 5-10 seconds and retry.)
+
+At this point you hopefully have a kiosk server that auto-starts whenever the PC is booted.
 
  
 
-## Make user MOTUS_KIOSK auto start kiosk gui on login
+### 3.0 - Make user MOTUS_KIOSK auto start kiosk gui on login
 
- 
+The kiosk gui that the user sees is displayed by OpenKiosk which is a completely locked down display so the public can not access anything on the computer except the gui we show them.  We want the kiosk to start up automatically when the MOTUS_KIOSK user logs in.
 
-The kiosk gui that the user sees is displayed by OpenKiosk which is a completely locked down display so the public cant access anything on the computer except the gui we show them.
+It must open in its "own shell" - not the normal explorer.exe shell to prevent the user from being able to access the windows desktop or other applications such as cmd.exe
 
- 
+**3.1** Log in as MOTUS_KIOSK
 
-First need to find the MOTUS_KIOSK ‘security identifier’ or SID.
+3.2 First we need to find the MOTUS_KIOSK ‘security identifier’ or SID.
 
-·   *** you must be logged in a MOTUS_KIOSK **
+·   	- you must be logged in as user=MOTUS_KIOSK 
 
-·   Open CMD.exe
+·   	- Open a CMD.exe window
 
-·   Type: wmic useraccount get name,sid
+·		- Type the command :  wmic useraccount get name,sid
 
-·   Look at results and copy down the sid for MOTUS_KIOSK
+· 		- Look at results to locate the Sid for MOTUS_KIOSK
 
-e.g:  S-1-5-21-195043977-3097296022-4082461035-1012
+.			Example:  S-1-5-21-195043977-3097296022-4082461035-1012
 
--open the txt file, past in the new SID to the reg add cmd
+**3.2 **Next we prepare a comand string using a temporary text file.
 
--cut and past the whole reg add cmd
+. 		- Right-click anywhere on the Desktop and select 'New' > 'Text file' and open it for editing
+
+.		- Cut and paste this line into the file exactly as shown into the file (as a single line).
+
+```code
+reg add "HKEY_USERS\####\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v Shell /t REG_SZ /d """"c:\Program Files\OpenKiosk\OpenKiosk.exe""" http://localhost:8081"
+```
+
+.		- cut the MOTUS_KIOSK Sid SID from the command window
+
+.		- paste the into the "reg add cmd" in the text file - replacing only the four #### characters
+
+**3.3** Now copy (control-c) and paste (control-v)  the fully assembled command string into the Cmd.exe window and press 'Enter'
 
 It should say all is good
 
-Log ut, then log back in
+**3.4** Log out, then log back in as MOTUS_KIOSK You should see the auto-started kiosk app
 
-Should popup the kiosk app (may say unable to connect… if so it may
+**3.5** Click in kiosk window and type: Shift + F9  (to quit) and type the kiosk admin password.
 
-Just meant it took too long for the shiny app to start… hit ‘Try Again’ blue button
-
-Should now have full screen kiosk app.
-
- 
-
-First time – need to fix settings for motus_kiosk use of open kiosk.
-
-·   Click in kiosk window, then type: Shift + F1
-
-·   Type admin password in box, upper-left corner admin
-
-·   In OPenKiosk Tab
-
-o  **Check** EnableFullScreen
-
-o  UnCheck Enable Tabbed Browsing
-
-o  UnCheck Enable URL toolbar
-
-·   In Home tab
-
-o  Set homepage to : localhost:8081. << must agree with the shiny app startup task!
-
-Exit ‘Settings’, Then then type: Shift + F9. (retype openkiosk password)
-
-Return to windows desktop.. log out, the relogin
+**3.6** You can now delete the temporary text file from the Desktop
