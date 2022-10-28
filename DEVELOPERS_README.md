@@ -2,9 +2,7 @@
 
 
 ### Ankeny Hill Nature Center MOTUS Kiosk ###
-This document is a collection of notes, ramblings, code snippets, problems encountered, future 'to do list' etc by the author to remind me what I did and why.    While mostly to assist me I include it in the project repo as possibly future developers and maintainers of the kiosk software might benefit.
-
-Also is a guide on how to get the build tools installed, the kiosk app out of source control (git), and how to do the first build.
+This document is a collection of notes, ramblings, code snippets, problems encountered, future 'to do list' etc by the author to remind myself of what I did and why.   While mostly to assist me I include it in the project repository as possibly future developers and maintainers of the kiosk software might benefit from it.
 
 
 ### Who do I talk to? ###
@@ -54,7 +52,7 @@ Nothing precludes you from choosing a different operation system. I have develop
 
 NOTE: A significant amount of sysadmin level setup is needed with Windows-10 to get the kiosk app fully up and running smoothly. Including user account creation, directory creation, registry edits and group policy management , taskManager job setups, timeout and screen-saver behaviours, installing git, R and other 3rd party tools and packages etc.  It may sound duanting but it is sort of a one-time thing you can hopefully farm-out to someone who has familiarity with doing those kinds of things perhaps in a small office environment. All of this Windows-specific setup will be documented separately - hopefully with enough detail that a somewhat courageous intermediate windows user can follow..
 
-See: (Sorry, document is a work in progress and will be posted to github as soon as its available)
+See: WINDOWS_FIRSTBOOT_README.md
 
 ##### The Kiosk System 
 Several options we examined. Those with $$ costs or subscriptions were rejected.
@@ -93,109 +91,13 @@ For multi-language support this app uses the i18n package to perform language tr
  You can host standalone apps on a webpage or build dashboards. When run on the local machine
  from a cmd line it will start a 'shiny server' on a local machine URL that you can point your browser to.
  Most importantly to us we can point OpenKiosk to that URL to display it as our dashboard.
- You can also use R-Studio to deploy the whole application to Shiny.io to have it hosted as a publicly
- accessible web site.
+
+You can also use R-Studio to deploy the whole application to Shiny.io to have it hosted as a publicly
+ accessible web site via a www http request.  I did this for awhile so that the rest of my team could comment during development.
 
 It is important to recognize the distinction between the Shiny dashboard application and the kiosk being provided by OpenKiosk.
 
 There is a complete seperation of concerns... there are many ways to run and display the dashboard content - its just an app on an http server.  One of the ways to display the content and interact with it is via OpenKiosk. OpenKiosk is the tool I have chosen to to host the dashboard in a very locked-down fashion.  
-
-### How do I get started? ###
-
-* Install R for your platform (see: https://www.r-project.org/)
-
-* Install R-studio IDE Free Edition for your platform (see:https://www.rstudio.com/products/rstudio/download/)
-
-* The project and code is available on a github repository  at :
-
-You will need a github account to clone the repository.
-Presumably if you are viewing this file you have that figured out.
-
-You also need to install git on the machine you wish to download the project to. (See: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-
-Create a directory for the project - for example on Windows I use C:\Users\MOTUS_KIOSK\Projects as my top-level directory
-
-Open a command window such as Cmd.exe and type:
-
-```code
-cd  C:\Users\MOTUS_KIOSK\Projects
-git clone https://github.com/rschramm9/AHNC_MOTUS_KIOSK.git
-```
-
-git will pop up an authentication options window – provide your git credentials via a web browser
-download should proceed along the lines of:
-
-```code
-Cloning into 'AHNC_MOTUS_KIOSK'...
-remote: Enumerating objects: 11, done.
-remote: Counting objects: 100% (11/11), done.
-remote: Compressing objects: 100% (10/10), done.
-remote: Total 11 (delta 4), reused 5 (delta 1), pack-reused 0
-Receiving objects: 100% (11/11), 13.99 KiB | 2.33 MiB/s, done.
-Resolving deltas: 100% (4/4), done.
-```
-
-A complete copy of the repository should now be in subdirectory at: C:\Users\MOTUS_KIOSK\Projects\AHNC_MOTUS_KIOSK
-
-Your first run....
-
-Now run the R-Studio IDE. Once open, Click File > New Project 
-
-File > New Project. From NewProjectWizard  select “Existing Directory”
-
-“Browse”  **INTO** the folder: C:\Users\MOTUS_KIOSK\Projects\AHNC_MOTUS_KIOSK and click “Open”
-
-Back in the wizard, Click “Create Project”
-
- From the IDE  Right-side  “Files” Panel,  click to open file global.R
-
-Check at the top of the code window for a warning regarding several packages that need to be installed… Go ahead and click the “Install”  Wait while it installs numerous package dependencies. This can take around 4 to 5 minutes….
-
- Repeat the above check for packages needing to be installed as needed for files:
-
-ui.R
-
-server.R
-
-modules/receiverDeploymentDetections.R
-
-modules/ReceiverDetections.R
-
-modules/tagDeploymentDetails.R
-
-modules/tagDeploymentDetections.R
-
- 
-
-Close the tabs for all source code files **EXCEPT**  global.R, ui.R and server.R
-
-With one of those three files selected for view in the code window, notice the green arrow labeled “Run App”. Click that. After RStudio builds the app it should pop-up the app in its own browser window. 
-
-Two other things to note...
-
-1-When the app is running - on the Console tab will be a red stop-sign. Use that to halt the app to make changes or reload the config file etc
-
-2-Just after the app starts up, if you scroll down thru the output in the Console tab, you will find:
-
-"Listening on http://127.0.0.1:####". This is the temporary URL and port that Shiny assigns.  You may be curious to try cutting that URL to your clipboard and pasting it into any browser on any machine on your local network.  It should work!
-
-#### Configuration ####
-
-See file kiosk.cfg in the project's top-level directory.  It contains key value pairs
-that do things like set the target motus receiver using its Motus database ID. You probably want to point the app to your own receiver instead of ours!
-
-To locate  your receiver's ID:  Go to motus.org Then : ExploreData>Projects
-
-Find your ProjectID, then click on the link that takes you to your project's description.  Look for the item named "Receivers" and click the link next to it saying ""(Table)"
-
-Edit. the kiosk.cfg file using your information.
-
-```code
-ReceiverID=7948
-MainLogoFile="images/logos/ankenyhill_logo.png"
-MainLogoHeight=140
-MainTitle="Test Data"
-```
 
 
 
@@ -327,3 +229,28 @@ Issues… I cant get ggplot to color fill countries
 
 See maybe: https://www.riinu.me/2022/02/world-map-ggplot2/
 
+### R Package Install issues
+
+Sometimes package xxxx installs hang with message such as:
+
+> ```
+> Error in library(xxxx) : there is no package called 'xxxx'
+> ```
+
+See: https://stackoverflow.com/questions/47395807/error-there-is-no-package-called-and-trying-to-use-install-packages-to-so
+
+This means that you don't have the package `readr` installed on your computer.
+
+You then installed it with
+
+```r
+install.packages('xxxx', dependencies = TRUE)
+or 
+install.packages('xxxx', dependencies = TRUE, repos='http://cran.rstudio.com/')
+```
+
+which is good. Most packages are not "stand-alone", they use other packages too, called dependencies. Because you used the default `dependencies = TRUE`, all the dependencies (and their dependencies) were also installed.
+
+You can look at the CRAN page for `readr`: [https://CRAN.R-project.org/package=readr](https://cran.r-project.org/package=readr) to see its dependencies (anything in the "Depends" or "Imports" fields is required). And of course you need the dependencies of those dependencies, etc. Now that `readr` is installed along with its dependencies, you can run `library(readr)` to load it.
+
+ 

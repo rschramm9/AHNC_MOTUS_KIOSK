@@ -92,7 +92,7 @@ tryCatch(
     tryCatch(
       {
         # use assign so you can access the variable outside of the function
-        #attempt to read file from current directory
+        #attempt to read file from current directorygit commit glo
         # use assign so you can access the variable outside of the function
         assign("configfrm", read.table(file='sample.cfg',header=FALSE,
                                        sep='=',col.names=c('Key','Value')), envir=.GlobalEnv) 

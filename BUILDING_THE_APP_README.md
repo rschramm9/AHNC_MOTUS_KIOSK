@@ -1,12 +1,18 @@
-# Getting Started
+# Building the App
 
 
-### Ankeny Hill Nature Center Motus web app ###
-This document is a guide on how to get the 'Motus Kiosk' Shiny web app build tools installed, the kiosk app out of source control (git), and how to do the first build.
+### Ankeny Hill Nature Center Build the Motus web app ###
+This document is a guide on how to get the 'Motus Kiosk' Shiny web app build tools installed, the kiosk app out of source control (git), and how to do the first build.  At the end of this you should have the shiny web app up-and-running using  R-Studio on your local computer.
 
-At the end you should have the web app up-and-running using  R-Studio on the local computer.
+Unfortunately there are quite a number of steps and tweaks to Windows 10 and the user accounts settings required to get the full, securely locked-down kiosk behavior we ultimately require.
 
-Deployment and configuration of the app to a kiosk-like display using OpenKiosk is described in the companion document DEPLOYMENT_README.md in the project's top level directory.
+* If your immeadiate goal is to quickly get the sample dashboard up and running to explore on your own computer and user account you can skip those steps. 
+
+* If you really intend to deploy in full kiosk-mode I *strongly* urge you to begin with the document WINDOWS_FIRSTRUN_README.md in the project's top level directory that describes these settings and tweaks in full and painful detail.
+
+The final deployment and configuration of the app to a kiosk-like display using OpenKiosk is described in the third companion document FINAL_DEPLOYMENT_WINDOWS_README.md in the project's top level directory.
+
+If you are wanting to modify or further develop the application there is a fouth document named DEVELOPERS_README.md that may be helpful.
 
 
 ### Who do I talk to? ###
@@ -34,9 +40,9 @@ The OpenKiosk is a basically a specialized web browser with configurable restric
 
 See: https://openkiosk.mozdevgroup.com
 
-There are many other ways to display the application including simple Chrome or Firefox browsers or even pushing the web app to remote web server etc.
+There are many other ways to display the application including simple Chrome or Firefox browsers or even pushing the web app to remote web server for access by the www etc.
 
-It is important to recognize this distinction between the Shiny dashboard web application and the kiosk being provided by OpenKiosk.
+It is important to recognize this distinction between the Shiny dashboard web application and the kiosk behavior being provided by OpenKiosk.
 
 ##### The programming/language environment
 
@@ -59,20 +65,23 @@ All of the desired tagged bird detection information is available via simple htt
 
 ##### Install R for your platform
 
-(see: https://www.r-project.org/)
+If not already done. (see: https://www.r-project.org/)
 
 ##### Install R-studio IDE Free Edition for your platform
 
- (see:https://www.rstudio.com/products/rstudio/download/)
+If not already installed.  (see:https://www.rstudio.com/products/rstudio/download/)
+
+##### Create the user account
+
+This and all other accompanying documentation assumes a particular Windows10 user account (username=MOTUS_KIOSK) and project directory structure: C:\Users\MOTUS_KIOSK\Projects
+
+While you may use any account to get the web app dashboard up-and-running - you will save yourself needing to repeat some of this work if you do it within the username and home directory on the local machine that you intend to deploy on.
 
 ##### Get the code
 
-The project and code is available on a github repository  at :
+Presumably if you are viewing this file you have this part figured out.  If not - the project and code is available on a github repository.  You will need a github account to clone the repository.
 
-You will need a github account to clone the repository.
-Presumably if you are viewing this file you have that figured out.
-
-You also need to install git on the machine you wish to download the project to. (See: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+You will first need to install git on the machine you wish to download the project to. (See: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
 Create a directory for the project - for example on Windows I use C:\Users\MOTUS_KIOSK\Projects as my top-level directory
 
@@ -108,23 +117,36 @@ From the shown "New Project Wizard"  select “Existing Directory”
 
 Once back in the wizard, Click “Create Project” button
 
- From the IDE  Right-side  “Files” Panel/Tab,  Click to open the file global.R
+ From the IDE  Right-side  “Files” Panel/Tab,  Click to open the file ***global.R***
 
 Check at the top of the main source code window for a warning regarding several packages that may need to be installed… Go ahead and click the “Install”  Wait while it installs numerous package dependencies. This can take around 4 to 5 minutes….
 
- Repeat the above check for other packages needing to be installed (if any) for files:
+Note: Occasionally a package install may hang with "package xxxx not found" displayed in the Console. So far that has been cleared by typing directly in the R-Studio Console like:
 
-ui.R
+```r
+install.packages('xxxx', dependencies = TRUE)
+or
+install.packages('xxxx', dependencies = TRUE, repos='http://cran.rstudio.com/')
+```
 
-server.R
 
-modules/receiverDeploymentDetections.R
 
-modules/ReceiverDetections.R
+ Repeat the above checks for other packages needing to be installed (if any) for source code files:
 
-modules/tagDeploymentDetails.R
+1. ui.R
 
-modules/tagDeploymentDetections.R
+2. server.R
+
+   (And in the modules sub-folder....)
+
+3. modules/receiverDeploymentDetections.R
+
+4. modules/ReceiverDetections.R
+
+5. modules/tagDeploymentDetails.R
+
+6. modules/tagDeploymentDetections.R
+
 
 Close the tabs for all source code files **EXCEPT**  global.R, ui.R and server.R
 
@@ -132,7 +154,7 @@ With one of those three files selected for view in the code window, notice a gre
 
 After RStudio builds the app it should pop-up the app in its own browser window. 
 
-Two other things to note...
+Two other things to observe...
 
 1-When the app is running - on the Console tab will be a red stop-sign. Use that to halt the app to make changes or reload the config file etc
 
@@ -148,18 +170,18 @@ To locate  your receiver's ID:  Go to motus.org Then : ExploreData>Projects
 
 Find your ProjectID, then click on the link that takes you to your project's description.  Look for the item named "Receivers" and click the link next to it saying ""(Table)"
 
-##### Make your own configuration file.
+##### Make your own configuration file using your receiver ID.
 
 In the project's top-level directory is a file called sample.cfg  It contains the default set of key value pairs
 that do things like set the target motus receiver using its Motus database ID.
 
+The contents of the ***sample.cfg*** file are shown. *Please dont modify this file* - create your own kiosk.cfg file as described below.
+
 * Copy the template file ***sample.cfg*** to a file named ***kiosk.cfg***
 
-* Edit your kiosk.cfg file to contain your site's information .
+* Edit your ***kiosk.cfg*** file to contain your own site's ID, your banner  logo file and title etc.
 
 * Restart the web application.
-
-The contents of sample.cfg file are shown below .
 
 ```code
 ReceiverID=7948
@@ -169,3 +191,21 @@ MainTitle="Test Data"
 ```
 
 
+
+##### Configure your own "Home" tab content
+
+The descriptive content that appears in the in the main page body when ever the "Home" tab is open comes from a language dependent .html file in the  project sub-directory www/docs.
+
+There is one file for each languge that the application supports - currently:
+
+* homepage_readme_en.html for English
+
+* homepage_readme_es.html for Spanish 
+
+Edit these two files carefully with an html editor or a text editor of yopur choice. 
+
+Someplace visible in your kiosk you *must* give proper credit to the Motus folks and Birds Canada and should include a statement regarding Acceptable Use.  I have chosen to put that in the section "Credits" on the "Home" screen. 
+
+**WARNING:** Teaching html document structure is beyond the scope of this documentation.  Be careful to maintain correct opening and closing html tags and verify that your changes render correctly in an html browser such as firefox or chrome before replacing the existing files.
+
+R St
