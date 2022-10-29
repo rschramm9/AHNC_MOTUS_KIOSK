@@ -63,7 +63,7 @@ Below is the approximate sequence I saw and followed on first boot of my Intel N
 
 6. Eventually get auto logged - it may ask you to brows ewith 'Microsoft Edge' - choose "Maybe Later"
 7. Click the lower-left corner ‘Start Window’ icon:  ![Figure1](./md_images/FR_StartWindowIcon.png)
-  Hover over the logged-in person icon - it should show the user you are logged in as -  it and then pick ‘Change account settings’  *Verify It says you are a local account and an Administrator*
+    Hover over the logged-in person icon - it should show the user you are logged in as -  it and then pick ‘Change account settings’  *Verify It says you are a local account and an Administrator*
 
 #### Main 2.0 - First Connection to Wireless Network
 
@@ -87,6 +87,10 @@ I am using wifi to connect to the internet. *If you already auto connect to netw
 
 I dont like to expose this password discovery mechanism on a computer that may have shared users. (Personal info may be discoverable).*Disabling the feature  is optional.*  While logged in as an administrator - We will edit an existing group policy using "gpedit" 
 
+
+
+If you have Windows 10 Home Edition - gpedit may be missing... paste  the two 'For' commands  below into a Cmd.exe window as Administrator/.   Othewise skip this step.....
+
 ```
 To install the Local Group Policy Editor in Windows 10 Home edition, open a command prompt as administrator and run two one-line commands in sequence:
 
@@ -98,7 +102,7 @@ then type gpedit in Cmd.exe
 
 ```
 
-https://answers.microsoft.com/en-us/windows/forum/all/how-to-enable-the-gpeditmsc-on-windows-10-and-11/dbc76919-f2b5-4dec-a2b7-bcf545c34d00
+see also: https://answers.microsoft.com/en-us/windows/forum/all/how-to-enable-the-gpeditmsc-on-windows-10-and-11/dbc76919-f2b5-4dec-a2b7-bcf545c34d00
 
 
 
@@ -114,7 +118,7 @@ https://answers.microsoft.com/en-us/windows/forum/all/how-to-enable-the-gpeditms
 
 6. Admin
 
-7. 
+   
 
 
 #### Main 5.0 - Remove “Microsoft OneDrive”  (Optional)
