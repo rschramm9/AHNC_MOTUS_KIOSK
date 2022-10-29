@@ -52,23 +52,29 @@ Please read the included LICENSE file and/or see <http://www.gnu.org/licenses/>.
 
 ### Hardware & Software Requirements
 
-I have quite successfully run on low-end  Intel NUC PC computers with Window 10 Pro pre-installed. These are easily purchased used on eBay for as little as $100. 
+I have quite successfully built and run the application in full kiosk mode on low-end  Intel NUC PC computers with Window 10 Pro pre-installed. These are easily purchased used on eBay for as little as $100.   I have also built and run the application on Apple Mac OSX (but not as a locked down kiosk).
+
+These are the machines I have used:
 
 NUC6CAY Celeron J3455 Processor 1.5Ghz 8GB Ram 120GB SSD w/wifi and Windows10 Pro (eBay $100)
 
 NUC7i5BNH MiniPC QUadCore i5-78260U 8Gb w/128Gb SSD w/wifi and  Windows 10 Pro. (eBay $185)
 
-As an experiment: CHUWI Larkbox PRO miniPC 6GbRam QuadCore 2.7Ghz Celeron J4125 with wifi and Windows 10 (Home Ed) $139 Amazon --not recommended due to reliablity concerns, but its cute!)
+As an experiment: CHUWI Larkbox PRO miniPC 6GbRam QuadCore 2.7Ghz Celeron J4125 with wifi and Windows 10 (Home Ed) $139 Amazon -- not recommended due to reliablity concerns, but its cute!
 
-The touchscreen: Dell 24 Touchscreen Model P2418HT (Dell.com $350)
+Apple Macbook Pro (circa 2018) 2.9 Ghz Intel core i9  32Gb w/macOS  12.6  (my development system)
+
+The touchscreen I use is : Dell 24 Touchscreen Model P2418HT (Dell.com $350)
 
 USB Keyboard and Mouse
 
-I *strongly* recommend Windows-10 PRO edition.  Home Edition works too but with some headaches.
+I *strongly* recommend Windows-10 PRO edition.  Home Edition works too but with some additional headaches getting set up.
 
 ### Where to Start?
 
-See **WINDOWS_FIRSTRUN_README.md** in the project's top level directory. 
+Easily 70% of the kiosk installation is getting Windows configured to work smoothly in kiosk mode. The 30% effort (or less) is getting the app built.  If you want to skip all of the Windows and kiosk-specific setup and just go play with the app in R and a browser, see BUILDING_THE_APP_README.md
 
-Alternately, if you want to skip all of the Windows and kiosk-specific setup and just play with the app in R, see BUILDING_THE_APP_README.md
+For the full kiosk behavior we need, start at **WINDOWS_FIRSTRUN_README.md** in the project's top level directory. 
+
+
 
