@@ -81,7 +81,7 @@ If not already installed.  (see:https://www.rstudio.com/products/rstudio/downloa
 
 Run R console.
 
-Enter the following cmds into the R Console just to make sure all are installed for the Admin user: (Hint, just cut and paste the whole bach into the console at one time)
+Enter the following cmds into the R Console just to make sure all are installed for the Admin user: (Hint, just cut and paste the whole batch into the console at one time)
 
 Note it may ask you to select a mirror sight - Use one close to you.  I used OSU's mirror
 
@@ -245,7 +245,7 @@ There is one file for each languge that the application supports - currently:
 
 * homepage_readme_es.html for Spanish 
 
-Edit these two files carefully with an html editor or a text editor of yopur choice. 
+Edit these two files carefully with an html editor or a text editor of your choice. 
 
 Someplace visible in your kiosk you *must* give proper credit to the Motus folks and Birds Canada and should include a statement regarding Acceptable Use.  I have chosen to put that in the section "Credits" on the "Home" screen. 
 
