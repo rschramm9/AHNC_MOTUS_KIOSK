@@ -50,6 +50,22 @@ along with this program source code when you obtained the software.
 
 Please read the included LICENSE file and/or see <http://www.gnu.org/licenses/>.
 
+### Hardware & Software Requirements
+
+I have quite successfully run on low-end  Intel NUC PC computers with Window 10 Pro pre-installed. These are easily purchased used on eBay for as little as $100. 
+
+NUC6CAY Celeron J3455 Processor 1.5Ghz 8GB Ram 120GB SSD w/wifi and Windows10 Pro (eBay $100)
+
+NUC7i5BNH MiniPC QUadCore i5-78260U 8Gb w/128Gb SSD w/wifi and  Windows 10 Pro. (eBay $185)
+
+As an experiment: CHUWI Larkbox PRO miniPC 6GbRam QuadCore 2.7Ghz Celeron J4125 with wifi and Windows 10 (Home Ed) $139 Amazon --not recommended due to reliablity concerns, but its cute!)
+
+The touchscreen: Dell 24 Touchscreen Model P2418HT (Dell.com $350)
+
+USB Keyboard and Mouse
+
+I *strongly* recommend Windows-10 PRO edition.  Home Edition works too but with some headaches.
+
 ### Where to Start?
 
 See **WINDOWS_FIRSTRUN_README.md** in the project's top level directory. 
