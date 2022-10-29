@@ -58,7 +58,7 @@ When open kiosk runs it may appear to lock you out of viewing other windows (inc
 
 Download and install OpenKiosk from https://openkiosk.mozdevgroup.com/
 
-It’s a long download that ends up in your downloads folder – something like OpenKiosk91.7.0-2022-02-22-x86_64.exe
+*It’s a long download* that ends up in your downloads folder – something like OpenKiosk91.7.0-2022-02-22-x86_64.exe
 
 Double-click the installer. Windows may show “Windows protected your PC”,  just click “More info” and select “Run anyway”
 
@@ -114,6 +114,8 @@ Shiny kiosk App.R is the background server application needed by the kiosk web p
 
 .			-  The task will be named MOTUS_KIOSK_SERVER
 
+.			-  Location field is just a default backslash character
+
 ·   		-	Check the option  ‘Run whether user is logged on or not”
 
 ·   		-	Check that it is set to run under the Admin account.
@@ -138,8 +140,10 @@ Shiny kiosk App.R is the background server application needed by the kiosk web p
 
 .			- Now fill the the Action "Add arguments" field as written below (with quotes as shown):  Note the port number selected must match the OpenKiosk default homepage set in previous section.
 
+WARNING: sometimes a cut&paste from below will replace the single quotes that wrap the directory path  with a reversed quote (’). Its really hard to spot so make sure after the paste they both are true single quotes!
+
 ```code
--e “shiny::runApp(‘C:/Users/MOTUS_KIOSK/Projects/AHNC_MOTUS_KIOSK’,)
+-e “shiny::runApp('C:/Users/MOTUS_KIOSK/Projects/AHNC_MOTUS_KIOSK',)
 ```
 
 .			- Press "OK"  for the action button.
@@ -160,11 +164,15 @@ Note that on a slow PC, sometimes it takes a few moment for the server to fully 
 
 **TROUBLE SHOOTING:** If the browser doesnt display the dashboard. Try opening a Cmd.exe window and R-Studio side-by-side. In the command window type the full command below all as a single line:
 
+WARNING: sometimes a cut&paste from below will replace the single quotes that wrap the directory path  with a reversed quote (’). Its really hard to spot so make sure after the paste they both are true single quotes!  Same for the double-quotes.
+
 ```
-“C:\Program Files\R\R-4.2.1\bin\R.exe” -e “shiny::runApp(‘C:/Users/MOTUS_KIOSK/Projects/AHNC_MOTUS_KIOSK’,port=8081)"
+“C:\Program Files\R\R-4.2.1\bin\R.exe” -e “shiny::runApp('C:/Users/MOTUS_KIOSK/Projects/AHNC_MOTUS_KIOSK',port=8081)"
 ```
 
 View the command output for hints to the error - sometimes it has been a failed package load and there will be a message like "No package xxxx not found".  This can usually be cleared by typing install.package("xxxx") in the RStudio console.  (See also the BUILDING_THE_APP_README.md Section 3.0)
+
+Another trick to debugging the task startup.  Highlight the task and rightclick to 'Export'.  Save it tio the desktop, then open the .xml file with notepad. Examin the contents of the action at the bottom.  Try cut&past the command and the arguments together , then execute in a Cmd.exe windo and look for clues. 
 
 Once you are able to get the Kiosk dashboard to display in a Web browser,  shutdown and reboot the PC. Then point your web browser again to localhost:8081
 
@@ -217,3 +225,9 @@ It should say all is good
 **3.5** Click in kiosk window and type: Shift + F9  (to quit) and type the kiosk admin password.
 
 **3.6** You can now delete the temporary text file from the Desktop
+
+**Troubleshooting:**  WARNING: Sometimes on system reboot, the kiosk will come up blank with "Unable To Connect"
+
+That typically means the MOTUS_KIOSK_SERVER was either slow to start or failed to start at boot.  Wait a 10 seconds and "Try Again" If success -  If no luck... then in the Kiosk window type Shift-F9 and enter the pasword to quit
+
+Go to Section 2 try to troubleshoot the auto-start at boot of the shiny server.

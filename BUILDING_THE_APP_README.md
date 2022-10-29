@@ -31,7 +31,7 @@ The 'kiosk system' can be viewed as built on these .
 * The motus.org remote data server. 
 
 ##### Operating System
-Windows OS was specified as a requirement for the Ankeny Hill Nature Center.
+Windows 10 Pro ROS was specified a requirement for the Ankeny Hill Nature Center.
 
 Nothing precludes you from choosing a different operation system. I have developed and run everything quite well at home under Mac OSX (v12.6) and deployed to Windows 10 target.  It should also be able to be run on small generic linux machines although I have not attempted to verify. 
 
@@ -65,17 +65,25 @@ All of the desired tagged bird detection information is available via simple htt
 
 ##### 2.0 - Install R for your platform
 
-If not already done. (see: https://www.r-project.org/)
+Log in as administrator
+
+If not already done. (see: https://www.r-project.org/) - Download the installer to your downloads folder
+
+Double-clidk the installer.
+
+Make sure it says to install into "C:\Program Files\R\R-4.4.1" (or whatever your downloaded version is)
 
 ##### 3.0 - Install R-studio IDE Free Edition for your platform
 
+Log in as administrator
+
 If not already installed.  (see:https://www.rstudio.com/products/rstudio/download/)
 
-As user=Admin
+Run R console.
 
-Run R-Studio
+Enter the following cmds into the R Console just to make sure all are installed for the Admin user: (Hint, just cut and paste the whole bach into the console at one time)
 
-Enter the following cmds into the RSstudio Console just to make sure all are installed for the Admin user:
+Note it may ask you to select a mirror sight - Use one close to you.  I used OSU's mirror
 
 ```
 install.packages("shiny")
@@ -100,7 +108,7 @@ install.packages("DT")
 
 
 
-##### 4.0 - Create the user account
+##### 4.0 - Create the MOTUS_KIOSK user account
 
 This and all other accompanying documentation assumes a particular Windows10 user account (username=MOTUS_KIOSK) and project directory structure: C:\Users\MOTUS_KIOSK\Projects
 
@@ -112,13 +120,13 @@ Presumably if you are viewing this file you have this part figured out.  If not 
 
 You will first (as administrator) need to install git on the machine you wish to download the project to. (See: https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
+NOTE: This install can be a bit frustrating due to the variations of Windows 10 installations.  WIndows 10 Pro was pretty straight forward. With Windows 10 Home Edition it is challennging to get git.exe recognized on the path. Persistence is key.. the git.exe install should be to C:\Program Files.  You may need to 'cd' there in the cmd.exe window to run git...
+
 ##### 6.0 - Get the code
 
 As user = MOTUS_KIOSK
 
 Create a directory for the project - for example on Windows I use **C:\Users\MOTUS_KIOSK\Projects** as my top-level directory. If you dont already have the Projects folder - create it now as User=MOTUS_KIOSK
-
-Ankeny7029
 
 Open a command window such as Cmd.exe and type:
 

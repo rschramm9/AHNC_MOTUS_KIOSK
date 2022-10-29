@@ -27,9 +27,13 @@ Also - if you are jumping in from a computer that has already been 'spun up' or 
 
 ### Preliminaries ###
 
-This and all other accompanying documentation assumes a particular Windows10 user account.  
+Unfortunately Microsoft supplies 'Windows 10' in different configurations - Windows 10-Pro is recommended though you may have received 'Home Edition'. Or you may have ended uop with Windows-11 (I hope not...)
 
-We will be setting up two accounts, one user with administrator permissions and one unprivledged user that the kiosk will run under.  The unprivledged account will be auto-login with no password. 
+There are variations within released versions and even customizations - so called 'Experience pacakages' within version.  So it is impossible to write detailed instruction that are accurate across all variations.
+
+Strongly advised is Windows 10-Pro and that is what this document assumes.  Hopefully where we differ you can use what I provide and some hunting-around to get to the correct settings.
+
+We will be setting up two accounts, one user with administrator permissions and one unprivileged user that the kiosk will run under.  The unprivileged account will be auto-login *with no password*. 
 
 You should be prepared to provide the following information:
 
@@ -40,7 +44,9 @@ You should be prepared to provide the following information:
 
 #### Main 1.0 - New Computer w/Windows 10 - First Boot
 
-***You may skip this section if you already have a computer you can log in as the administrator by Windows default startup that would be username=User with no password***
+***You may skip this section if you already have a computer you can log in as the administrator.***
+
+If you aquired this computer as new - the first boot will take you through creating the first administrator account. If you received a preowned computer it will likely already have an administrator account and boot directly in to it. Typically the account is named something like "User"
 
 Here we assume a brand new computer with Windows pre-installed.
 
@@ -49,29 +55,52 @@ Below is the approximate sequence I saw and followed on first boot of my Intel N
 1. Power on, let the boot start…  *I didn't do F10 key or anything at the bios ‘select boot’ screen*
 2. After about 2 minutes while it was looking dead,  it should finally start to boot, it may say restarting etc, then it eventually goes back to ‘select boot’, bios screen and then proceeds to start the boot to windows. Be patient...
 3. It may go straight into ‘working on updates’ blue screen.  It takes awhile,  Says “94% complete” fairly quickly, then still took a while to get to 100%. ( I don’t know where it thinks its getting updates from…. its likely not on the network yet, - just let it go)
-4. Eventually get a  “User ‘Welcome" message, and eventually get auto logged in as user = “User”
-5. Click the lower-left corner ‘Start Window’ icon:  ![Figure1](./md_images/FR_StartWindowIcon.png)
-Hover over the logged-in person icon - it should show "User" it and then pick ‘Change account settings’
-6. Verify It says you are “User” ,  a local account and an Administrator
+4. Eventually you will get some kind of  “User ‘Welcome" message
+5. You may get a whole series of questions from the 'Cortana' assistant - if you do:
+   1. If you get asked to create a user - create a user named "Admin" and provide some security answers if you are forced to (I dont like these and will disable them further down in this guide.
+   2. When Cortana gets to "Choose privacy settings" turn the all 'Off'
+   3. When Cortana asks "Let Cortana help you" Choose "Not Now"
+
+6. Eventually get auto logged - it may ask you to brows ewith 'Microsoft Edge' - choose "Maybe Later"
+7. Click the lower-left corner ‘Start Window’ icon:  ![Figure1](./md_images/FR_StartWindowIcon.png)
+  Hover over the logged-in person icon - it should show the user you are logged in as -  it and then pick ‘Change account settings’  *Verify It says you are a local account and an Administrator*
 
 #### Main 2.0 - First Connection to Wireless Network
 
-I am use wifi to connect to the internet. *If you already auto connect to network on your computer you may skip this step.*
+I am using wifi to connect to the internet. *If you already auto connect to network on your computer you may skip this step.*
 
-1. Settings, search for network, go to Network&Internet >Status
-2. Note status is Not Connected
-3. On status page, just above “Advanced Network settings” click ‘show available networks’
-4. Pop-up shows available network names, choose yours 
-5. Log into your network name and set ‘login to this network automatically’
+1. In the search box , lower-right corner type Settings.
+2. Select the 'Settings App'  and open it.
+3. Choose to 'Network&Internet'  > 'Status'
+4. Note status is Not Connected
+5. On status page, just above where is says “Advanced Network settings” - click "Show available networks"
+6. A Pop-up shows all available network names, choose your WiFi system 
+7. Check "Connect Automatically" (if shown) and click  "Connect" 
+8. Log into your network (and set ‘login to this network automatically’ if itis shown here)Set
 
 #### Main 3.0 - Rename computer (optional)
 
 1. Start>Settings>System>About
-2. Change the name to anything you like.  I used AHNC_MOTUS1
+2. Use Rename this PC to change the name to anything you like.  I used AHNC-MOTUS1
 
 #### Main 4.0 - Change group password policy to disable the “password security questions” 
 
 I dont like to expose this password discovery mechanism on a computer that may have shared users. (Personal info may be discoverable).*Disabling the feature  is optional.*  While logged in as an administrator - We will edit an existing group policy using "gpedit" 
+
+```
+To install the Local Group Policy Editor in Windows 10 Home edition, open a command prompt as administrator and run two one-line commands in sequence:
+
+FOR %F IN ("%SystemRoot%\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientTools-Package~*.mum") DO (DISM /Online /NoRestart /Add-Package:"%F")
+
+FOR %F IN ("%SystemRoot%\servicing\Packages\Microsoft-Windows-GroupPolicy-ClientExtensions-Package~*.mum") DO (DISM /Online /NoRestart /Add-Package:"%F")
+
+then type gpedit in Cmd.exe
+
+```
+
+https://answers.microsoft.com/en-us/windows/forum/all/how-to-enable-the-gpeditmsc-on-windows-10-and-11/dbc76919-f2b5-4dec-a2b7-bcf545c34d00
+
+
 
 1. Open the Start menu in desktop lower-left and Search for gpedit and run it (note it may say "Edit Group Policy" instead of gpedit). 
 
@@ -81,26 +110,32 @@ I dont like to expose this password discovery mechanism on a computer that may h
 
 4. Select the “Enabled” radio button. (you are ‘enabling’ the prevention policy)
 
-5. Select ‘OK’
+5. Select 'Apply' then ‘OK’User
+
+6. Admin
+
+7. 
 
 
 #### Main 5.0 - Remove “Microsoft OneDrive”  (Optional)
 
-ControlPanel>Programs>UnistallProgram
+ControlPanel>Programs&Features  Select One-Drive , Rightclick and choose UnistallProgram
 
 #### Main 6.0 - Customize Microsoft Edge (Optional)
 
-The first time you run Microsoft's default Edge browser it goes through several windows that attempt to sign you up for a bunch of services and features we do not need or want.  Go ahead and open Edge and be careful on those first few screens.  It is completely ok to select No Thanks to everything and to 'Proceed without this data' etc.
+The first time you run Microsoft's default Edge browser it may go through several windows that attempt to sign you up for a bunch of services and features we do not need or want.  Go ahead and open Edge and be careful on those first few screens.  It is completely ok to select No Thanks to everything and to 'Proceed without this data' etc.
 
 #### Main 7.0 - Install Google Chrome
 
+Before starting please read and note the following
+
+- ***if asked - do not ‘sign-in’ to google, setup any apps (mail etc)***
+
+- ***if asked - do not turn on ‘Sync’, do not ’Import Settings’ or ‘Bookmarks’***
+
+- **if asked deselect any add-ins, tracking and bloat-ware that google offers**.
+
 - Use the Microsoft's "Edge" browser to find, download and install Chrome (run the downloaded setup.exe).
-
-- ***do not ‘sign-in’ to google, setup any apps (mail etc)***
-
-- ***do not turn on ‘Sync’, do not ’Import Settings’ or ‘Bookmarks’***
-
-- ***deselect any add-ins, tracking and bloat-ware that google offers.*** 
 
 - Exit Edge when done 
 
@@ -111,9 +146,13 @@ The first time you run Microsoft's default Edge browser it goes through several 
 
 Use Chrome to install Firefox. – again, ***no sign-in, no extra features etc.***
 
+Firefox may put the installer in your 'Downloads' folder , use the explorer to run it from there 
+
 #### Main 9.0 - Turn off auto-updates
 
- (See Appendix 5)
+I like to control when updates happen manually - so I can backup and roll-back if something breaks
+
+ Follow instructions in Appendix 2
 
 #### Main 10.0 - Disable the windows “Lock Screen” 
 
@@ -253,6 +292,8 @@ Then choose either 'Create Password' or 'Delete the account'
 
 Un-pin Edge Icon from taskbar (right-click and un-pin)
 
+If visiible - delete Cortana Icon from taskbar (right-click and uncheck 'Show Cortana Button'
+
 #### A1.3.   Cleanup the ‘Start Window’
 
  Click the lower-left corner ‘Start Window’ icon to raise the "Start Panel":  ![Figure1](./md_images/FR_StartWindowIcon.png)
@@ -308,9 +349,9 @@ On the TaskBar at lower-right, hover over ‘meet now’ camera icon, r-click an
 
 \- Hide the ‘MeetNow’ icon in taskbar if present 
 
-​	a.   navigate to **Settings** → **Personalization** → **Taskbar**.
+​	a.   navigate to **Settings** → **Personalization** → **Taskbar** (using the right-sidebar)
 
-​	b.   In the 'Notification area' section click on the hypertext option **"Turn system icons on or off"  **
+​	b.   In the text 'Notification area' section click on the hypertext option **"Turn system icons on or off"  **
 
 ​	c.   Locate the **Meet Now** and toggle setting to the off position. 
 
@@ -415,7 +456,7 @@ If you have Windows 10 Professional, you can change this option using a Group Po
 
 ![Figure1](./md_images/FR_Lockscreen_gpedit.png)
 
-Select “Administrative Templates” and then double-click “Control Panel.”
+Select “Computer Configuration > Administrative Templates” and then double-click “Control Panel.”
 
 ![Figure1](./md_images/FR_Lockscreen_AdminTemplates.png)
 
@@ -465,6 +506,10 @@ Your regedit window should now look like this:
 ###  Appendix 4 -  Install OpenSSH (Optional)
 
 Both OpenSSH components can be installed using Windows Settings on Window Server 2019 and Windows 10 devices. (See also: https://docs.microsoft.com/en-us/windows-server/administration/openssh/openssh_install_firstuse)
+
+It doesnt look like Open SSH is available for Window2 10 Home Edition - if you really want it you may try this: https://superuser.com/questions/1283947/how-to-use-ssh-on-windows-10-home-edition
+
+
 
 To install the OpenSSH components:
 
