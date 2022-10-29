@@ -248,11 +248,11 @@ Log in as Admin and using ControlPanel app
 
 **17.2.** Hardware&Sound>PowerOptions>ChooseWhenToSleepComputer = never 
 
-#### Main 18.0 - Remove the default "User" administrator account
+#### Main 18.0 - Remove any unprotected  administrator accounts
 
-We will disable the "User" administrator account as it has no password and is a security risk
+If you have any administrator accounts with no password it is a security risk. Some computers purchased used may have an account name something like "User" that you used at first boot.
 
-Completely shut down and restart your computer, make sure you can log in as user=Admin and 
+Completely shut down and restart your computer, make sure you can log in as user=Admin and it is a local administrator.
 
 Use the ControlPanel to navigate to:
 
