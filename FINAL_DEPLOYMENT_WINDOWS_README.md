@@ -66,7 +66,7 @@ Accept the license, and click through all the standard default installation wiza
 
 Go to C:\Program Files and run OpenKiosk by double-clicking it – It will run in its own browser an it will likely look like your locked onto that screen… (that’s a good thing!)
 
-Shift F1 puts administrator login banner up in the upper-left. Enter ‘admin’ as the password.
+Shift F1 puts administrator login banner up in the upper-left. Enter ‘admin’ as the password (this is the default password for OpenKiosk.
 
 While on the admin page:
 
@@ -92,7 +92,7 @@ Verifiy Settings are:
 - "Enable URL Toolbar" False (box unchecked)
 - In the "Quit" section, "Enable Quit Button Password" True (checked box)
 - "Allow Multiple Displays" False
-- Password section - you may wish to change the admin password - but r*emember it - there is no password recovery mechanism!!*
+- In the "Password" section - you may wish to change the OpenKiosk admin password - but r*emember it - there is no password recovery mechanism!!*
 
 "Quit" the OpenKiosk (button on upper right of the main panel)
 

@@ -18,7 +18,7 @@ This doc also includes some steps that 'technically unnecessary' but deal with m
 
 If you are well experienced in Windows system administration it may be more tedious and verbose than you need.  If you are a novice, hopefully it will be detailed enough to get you through and on to the fun parts.
 
-Also - if you are jumping in from a computer that has already been 'spun up' or if you like to skip ahead but be advised, you may get away with skipping some steps but you will likely need to come back to get everything set just as it should be.
+Also - if you are jumping in from a computer that has already been 'spun up' or if you like to skip ahead but be advised, you may get away with skipping some steps but you will likely need to come back here to get everything set just as it should be.
 
 
 ### Who do I talk to? ###
@@ -114,7 +114,7 @@ see also: https://answers.microsoft.com/en-us/windows/forum/all/how-to-enable-th
 
 4. Select the “Enabled” radio button. (you are ‘enabling’ the prevention policy)
 
-5. Select 'Apply' then ‘OK’User
+5. Select 'Apply' then ‘OK’
 
 6. Admin
 
@@ -181,7 +181,7 @@ This should pop-up a “Microsoft account” dialogue window,
 
 * Click apply. You should now see the "Admin" user under “Other Users” as a “Local account” – click on it to select, then click “Change account type” and set it to be an Administrator and click OK.
 
-* Verify the Admin account now shows up in the useres list as “Local Administrator”
+* Verify the Admin account now shows up in the users list as “Local Administrator”
 
 Log out completely, then log back in as “Admin” and let it go through the 'new user setup' screens.  On the ‘Choose privacy settings’ screen – set all of the optional settings to NO, and then press Accept.
 
@@ -193,7 +193,7 @@ Follow  "Appendix 1. Common Cleanup"
 
 #### Main 13.0 - Create a backup administrator account with password
 
-I strongly recommend adding a second Admin account in case you somehow damage the User=Admin account.  (*Later we will disable the "User" admin account as it has no password and is a security risk*)
+I strongly recommend adding a second Admin account in case you somehow damage the User=Admin account.  (*Later we will disable any "User" admin account that has no passwords and is a security risk*)
 
 Create and cleanup this backup administrator account of any name you choose just as you did above.
 
@@ -252,6 +252,8 @@ Log in as Admin and using ControlPanel app
 
 If you have any administrator accounts with no password it is a security risk. Some computers purchased used may have an account name something like "User" that you used at first boot.
 
+WARNING - DO NOT DELETE ANY ADMININSTRATOR ACCOUNT UNLESS YOU HAVE ANOTHER ACCOUNT TO LOG IN AS ADMINISTRATOR 
+
 Completely shut down and restart your computer, make sure you can log in as user=Admin and it is a local administrator.
 
 Use the ControlPanel to navigate to:
@@ -259,6 +261,8 @@ Use the ControlPanel to navigate to:
 User Accounts > User Accounts > Manage Another Account 
 
 Choose the account "User"
+
+
 
 Then choose either 'Create Password' or 'Delete the account'
 
