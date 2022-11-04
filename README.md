@@ -13,7 +13,7 @@ The Motus Wildlife Tracking System (Motus) is an international collaborative res
 
 *Figure 2 - The Kiosk Receiver Detections tab panel
 
-![Figure3](./md_images/RM_KioskReceiverDetections.png)
+![Figure3](./md_images/RM_KioskReceiverDetectionsMap.png)
 
 *Figure 3 - The Kiosk Receiver Detections map panel
 
