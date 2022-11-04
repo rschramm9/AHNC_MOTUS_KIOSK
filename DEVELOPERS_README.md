@@ -142,92 +142,9 @@ in global.R at startup.
 * Flight path
 The flight path data needs to be filtered to remove wild points... impossible flight path etc.
 not sure of the best algorithm to use.
-
-* Flight path map
-Would be great to have better looking maps, possibly with major city names or...
-
 * Add a 'species' tab to the data panel to provide 'natural history' info/photo about
 the animal detected? Info and photos probably have copyright issues to address. Possibly need a
 local database or CSV file to query based on the common 'species name' to something more rigourous
-
-
-
-### Coastlines and NaturalEarth Shape files ###
-
-I had a lot of difficulty using rnatural earth when I pushed the app to
-the web for testing.  I came across some help on stack exchange that recommended actually
-downloading the shape files and storing them locally.
-
-I obtained them from https://www.naturalearthdata.com/downloads/ and store them in 
-the sub-folder "map-data"
-
-roughly like in: https://nceas.github.io/oss-lessons/spatial-data-gis-law/3-mon-intro-gis-in-r.html
-```code
-# download the data 
-download.file("http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/physical/ne_50m_coastline.zip", 
-              destfile = 'coastlines.zip')
-
-# unzip the file
-unzip(zipfile = "coastlines.zip", 
-      exdir = 'ne-coastlines-50m')
-```
-so far Im using the 50m physical lakes and coastline data sets.
-
-great help found in:in: https://nceas.github.io/oss-lessons/spatial-data-gis-law/3-mon-intro-gis-in-r.html
-
-My problems with the push seemed to be the combination of ggplot and rnautural earth packages.
-If I used rnatural earth with sp.plot it pushed to shiny.io just fine
-If changed plotting to use ggplot to make better maps, the push failed.
-This ONLY effected pushes to shiny.io
-So  I changed a bunch of packages… - roughly following this:
-roughly like in: https://nceas.github.io/oss-lessons/spatial-data-gis-law/3-mon-intro-gis-in-r.html
-
-```code
-# SEE: https://nceas.github.io/oss-lessons/spatial-data-gis-law/3-mon-intro-gis-in-r.html
-library(rgdal)
-library(raster)
-library(ggplot2)
-library(rgeos)
-library(mapview)
-library(leaflet)
-library(broom) # if you plot with ggplot and need to turn sp data into dataframes
-options(stringsAsFactors = FALSE)
-
-
-### download the 50m data set
-download.file("https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/physical/ne_50m_coastline.zip",
- destfile = 'coastlines_50m.zip')
-unzip(zipfile = "coastlines_50m.zip", 
-          exdir = 'ne-coastlines-50m')
-
-download.file("https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/50m/physical/ne_50m_lakes.zip",
-  destfile = 'lakes_50m.zip')
-unzip(zipfile = "lakes_50m.zip", 
-           exdir = 'ne-lakes-50m')
-
-### download the 10m data set
-download.file("http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_coastline.zip", 
-              destfile = 'coastlines_10m.zip')
-unzip(zipfile = "coastlines_10m.zip", 
-      exdir = 'ne-coastlines-10m')
-
-download.file("https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/ne_10m_lakes.zip",
-  destfile = 'lakes_10m.zip')
-unzip(zipfile = "lakes_10m.zip", 
-            exdir = 'ne-lakes-10m')
-
-### load the data 
-coastlines <- readOGR("ne-coastlines-50m/ne_50m_coastline.shp")
-lakes <- readOGR("ne-lakes-50m/ne_50m_lakes.shp")
-### view spatial attributes
-##class(coastlines)
-
-```
-
-Other issues:
-Issues… I cant get ggplot to color fill countries
-
-See maybe: https://www.riinu.me/2022/02/world-map-ggplot2/
 
 ### R Package Install issues
 

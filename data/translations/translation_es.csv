@@ -7,7 +7,6 @@ ui_nav_page_help|Help / Feedback
 ui_app_common_rcodepanel|Reproducible R code
 ui_app_common_envirpanel|Environment version
 
-
 ui_app_common_outpanel|Output
 
 ui_mainpage_lang|Select UI language
@@ -22,10 +21,9 @@ ui_RCVR_detections_details_tab_helptext|La información de despliegue del ave et
 
 ui_RCVR_detections_flightpath_tab_label|Historial de vuelos
 ui_RCVR_detections_flightpath_tab_helptext|Los detalles del historial de vuelo del ave seleccionada
-.
-ui_RCVR_detections_map_tab_label|Mapa de vuelo
-ui_RCVR_detections_map_tab_helptext|Se mapea el historial de vuelo del ave seleccionada.
 
+ui_RCVR_detections_leaflet_tab_label|Mapa de vuelo
+ui_RCVR_detections_leaflet_tab_helptext|Se mapea el historial de vuelo del ave seleccionada.
 
 ui_RCVR_detections_species_tab_label|Species
 ui_RCVR_detections_species_tab_helptext|Información sobre la especie del ave seleccionada.

@@ -21,10 +21,6 @@
 # and was learned via exploring his ClinRTools modularized demo found at:
 # https://bitbucket.org/statsconsult/clinrtoolsdemo/src/master/
 
-# 
-# TODO
-# - split main interface into module-specific left panel and generic outputs for main panel
-# - add stratified randomization
 
 #####################
 #      UI PART      #
@@ -75,35 +71,46 @@ UI_ReceiverDetections <- function(id, i18n) {
               tabsetPanel(type = "tabs",
                           tabPanel(i18n$t("ui_RCVR_detections_details_tab_label"), 
                                    helpText(i18n$t("ui_RCVR_detections_details_tab_helptext")),
-                                   
                                    DT::dataTableOutput( ns('tagdetail') )
-                                   
                           ),
                           tabPanel(i18n$t("ui_RCVR_detections_flightpath_tab_label"), 
                                    helpText(i18n$t("ui_RCVR_detections_flightpath_tab_helptext")),
                                    DT::dataTableOutput( ns('flightpath') )
                                    
                           ),
-                          tabPanel(i18n$t("ui_RCVR_detections_map_tab_label"), 
+                          
+                          # implement a map using leaflet
+                          
+                          # TODO: This worked but height="60vh" was determined by trial and error
+                          # see: https://stackoverflow.com/questions/36469631/how-to-get-leaflet-for-r-use-100-of-shiny-dashboard-height/36471739#36471739
+                          # tabPanel(i18n$t("ui_RCVR_detections_leaflet_tab_label"), 
+                          #          helpText(i18n$t("ui_RCVR_detections_map_tab_helptext")),
+                          #          leafletOutput(ns('leaflet_map'), width = "100%", height="60vh")
+                          # ),
+                          
+                          # TODO: This works but height calc using 425px was determined by trial and error
+                          # should be either configurable in kiosk.cfg or possibly needs to be changed based on
+                          # the tabbed panel container height somehow.
+                          tags$style(type = "text/css", paste0("#",ns('leaflet_map')), "{height: calc(100vh - 425px) !important;}"),
+                          tabPanel(i18n$t("ui_RCVR_detections_leaflet_tab_label"), 
                                    helpText(i18n$t("ui_RCVR_detections_map_tab_helptext")),
-                  
-                                   plotOutput(ns('map'), width = "100%")
-                                  
+                                   leafletOutput(ns("leaflet_map"), width = "100%", height="100%")
                           ),
                           
-                       #   tabPanel(i18n$t("ui_RCVR_detections_species_tab_label"), 
-                       #            helpText(i18n$t("ui_RCVR_detections_species_tab_helptext")),
-                       #            ##tableOutput(ns('species_out'))
-                       #            
-                       #   ),
-                         
+                          # TODO: enable this for a future spcies tab
+                          #   tabPanel(i18n$t("ui_RCVR_detections_species_tab_label"), 
+                          #            helpText(i18n$t("ui_RCVR_detections_species_tab_helptext")),
+                          #            ##tableOutput(ns('species_out'))
+                          #            
+                          #   ),
+                          
               ) #end tabsetPanel            
        ) #end mainPanel
     ) # end sidebarLayout
   ) #end fluidPage
   
 } 
-# end funcion def for UI_ReceiverDetections
+# end function def for UI_ReceiverDetections
 
 
 
@@ -124,7 +131,6 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
 
     # Some code for UI observers, 
     
-    
     # A non-reactive function that will be available to each user session
     # populate detections_df and detections_subset_df as needed and render to sidebar table
      myTagsToTable <- function(x) {
@@ -134,15 +140,13 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
           detections_df <<- receiverDeploymentDetections(rcvrID)  
       }
        
-      #sort detections so most recent appears at top of list
+      #sort detections so most recent appears at top of list noteice we are woking with a global variable ( <<- )
       detections_df <<- detections_df[ order(detections_df$tagDetectionDate,decreasing = TRUE), ]
        
-       #subset the data frame to form a frame with only the columns we want to show
-      #also a global assignment 
+      #subset the data frame to form a frame with only the columns we want to show
+      # note also it's a global assignment 
       detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
       
-    
-      #output$mytable <- DT::renderDataTable(detections_subset_df, selection = "single",
       output$mytable <- DT::renderDataTable(detections_subset_df,
                                             selection = list(mode = 'single',
                                             selected = c(1) ),
@@ -164,29 +168,22 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
                                                          scrollY = 700
                                             ))
     }
-   
-    ######################################################
+
     observeEvent( session$clientData, {
         #  message("**session started ***")
       myTagsToTable()
     }) #end observeEvent for session start
     
-    observeEvent(input$btnQuery, {
-      message("**query button pressed ***")
-      myTagsToTable()
-    }) #end observeEvent for for requery button
+    ## requery motus button has been commented out as it was only for testing
+    #  observeEvent(input$btnQuery, {
+    #   message("**query button pressed ***")
+    #   myTagsToTable()
+    #  }) #end observeEvent for for requery button
     
     # Some UI elements should be updated on the Server side:
-    # Update Radiobuttons and arm text values when language is changed
+    # Update text values when language is changed
     observeEvent(lang(), {
       i18n_r()$set_translation_language(lang())
-      
-      #updateRadioButtons(session, "DESIGN", label = i18n_r()$t("ui_RAND_input_method"),
-      #                   choices =
-      #                     setNames(c("simple","block"),
-      #                             i18n_r()$t(c("ui_RAND_input_methodsimple","ui_RAND_input_methodblocked")) ),
-      #                   selected=input$DESIGN)
-
     })
     
     observeEvent(input$mytable_rows_selected,{
@@ -218,7 +215,6 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
         #print(species)
        
         tagDepID <- detections_subset_df[selectedrowindex,2]
-
         #print(class(tagDepID))
         #print(tagDepID)
         
@@ -247,52 +243,54 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
                                                  options=list(dom = 'Bfrtip',
                                                               searching = F
                                                  ))
+     
+        #print("********** tagflight_df ******")
+        #print(tagflight_df)
+        #print("********** end tagflight_df *********")     
         
-        # see: https://motuswts.github.io/motus/articles/06-exploring-data.html
-        # set limits to map based on locations of detections, ensuring they include the
-        # deployment locations
-        xmin <- min(tagflight_df$lon, na.rm = TRUE) - 2
-        xmax <- max(tagflight_df$lon, na.rm = TRUE) + 2
-        ymin <- min(tagflight_df$lat, na.rm = TRUE) - 1
-        ymax <- max(tagflight_df$lat, na.rm = TRUE) + 1
-      
-        print(xmin)
-        print(xmax)
-        print(ymin)
-        print(ymax)
+     
+        # labels for leaflet map popups
+        label_text <- glue(
+          "<b>Name: </b> {tagflight_df$site}<br/>",
+          "<b>Date: </b> {tagflight_df$date}<br/>",
+          "<b>Latitude: </b> {tagflight_df$lat}<br/>",
+          "<b>Longitude: </b> {tagflight_df$lon}<br/>") %>%
+          lapply(htmltools::HTML)
         
-        print(tagflight_df)
-        
-        coastlines_df <- SpatialLinesDataFrame(coastlines, coastlines@data) 
-        data_sf <- coastlines_df %>%
-          st_as_sf()
-        
-        
-        
-        # map
-        output$map<-renderPlot(
+        myLeafletMap = leaflet(data=tagflight_df) %>%
+          addTiles() %>%
           
-
-         ggplot(data = data_sf) +
-           geom_sf() +
-       
-           coord_sf(xlim = c(xmin, xmax), ylim = c(ymin, ymax), expand = FALSE) +
-           theme_bw() + 
-           labs(x = "", y = "") +
-           geom_path(data = tagflight_df, 
-                     aes(x = lon, y = lat, 
-                         #group = as.factor(tagid),
-                         colour = as.factor(tagDepID))) +
-           geom_point(data = tagflight_df,
-                      aes(x = lon, y = lat), 
-                      shape = 16, colour = "black") +
-     
-           scale_colour_discrete("TagDeploymentID") 
-         
-        ) #end renderPlot
+          addPolylines(lat= ~lat, lng = ~lon) %>%
+          ### enable next line if we want site labels to appear as each new map is rendered
+          ### addPopups(lat= ~lat, lng = ~lon, popup = ~site) %>%    
+          
+      
+          addCircleMarkers(
+            lng=~lon,
+            lat=~lat,
+            radius=5,
+            stroke=FALSE,
+            fillOpacity=0.5,
+            #color=~color??, # color circle 
+            popup=label_text
+          ) %>%
+          
+          # add 2nd set of markers that are bigger radius but completely transparent
+          # to implement a larger touch-target for the touchscreen
+          addCircleMarkers(
+            lng=~lon,
+            lat=~lat,
+            radius=15,
+            stroke=FALSE,
+            fillOpacity=0.0,
+            popup=label_text
+          )
+        
+        # render the output object named leaflet_map
+        output$leaflet_map = renderLeaflet(myLeafletMap) 
         
      
-    })  # end observeEvent   tableRowsSelect
+    })  # end observeEvent for mytable_rows_selected
     
 
   })

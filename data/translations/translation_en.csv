@@ -15,22 +15,19 @@ ui_mainpage_loading|Loading...
 ui_mainpage_readmefile|www/docs/homepage_readme_en.html
 
 
-
 ui_RCVR_title|Receiver Detections
 
 ui_RCVR_detections_details_tab_label|Tag Detail
 ui_RCVR_detections_details_tab_helptext|The selected tagged bird's deployment information.
 
-
 ui_RCVR_detections_flightpath_tab_label|Flight History
 ui_RCVR_detections_flightpath_tab_helptext|The selected bird's flight history details
 
-ui_RCVR_detections_map_tab_label|Flight Map
-ui_RCVR_detections_map_tab_helptext|The selected bird's flight history mapped.
+ui_RCVR_detections_leaflet_tab_label|Flight Map
+ui_RCVR_detections_leaflet_tab_helptext|The selected bird's flight history mapped.
 
 ui_RCVR_detections_species_tab_label|Species
 ui_RCVR_detections_species_tab_helptext|Information about the species of the selected bird.
-
 
 
 ui_RCVR_labelinfo|Enter label info here. Missing labels are ignored

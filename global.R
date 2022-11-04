@@ -29,11 +29,8 @@
 # Globals: libraries, modules etc.
 
 
-####install.packages("rnaturalearthdata")
-
-
 library(shiny)
-# library(shiny.router)
+
 library(shinymeta)
 library(shinyjs)
 library(shiny.i18n)
@@ -43,35 +40,23 @@ library(shinyWidgets)   # for pickerInput Widget flag thing
 library(rvest)  #for  web scraping
 library(tidyr) #for  web scraping
 
+#### for leaflet map
+library(leaflet)
 
-#### adding plots
+### glue for building leaflet labels
+library(glue)
+
 library(lubridate) # for working with dates
 
-
-library(sf) # mapping
-#####library(rnaturalearth) # mapping
-
-
-# SEE: https://nceas.github.io/oss-lessons/spatial-data-gis-law/3-mon-intro-gis-in-r.html
-library(rgdal)
-library(raster)
-library(ggplot2)
-library(rgeos)
-library(mapview)
-library(leaflet)
-library(broom) # if you plot with ggplot and need to turn sp data into dataframes
-options(stringsAsFactors = FALSE)
-
-
-###library(viridis) # colour palettes for plotting
-####
 library(tidyverse)
+
+options(stringsAsFactors = FALSE)
 
 default_UI_lang <- "en"
 
-
 ###### read configuration key/value pairs
 library(data.table)
+
 tryCatch( 
   {  
     #attempt to read file from current directory
@@ -112,9 +97,6 @@ tryCatch(
   })
 
 
-#configfrm <- read.table(file='kiosk.cfg',header=FALSE,
-#                        sep='=',col.names=c('Key','Value'))
-
 #print("******* configfrm **********")
 #str(configfrm)
 
@@ -139,22 +121,13 @@ lstValue <- configtbl['ReceiverID'][1,2]
 rcvrID <- as.numeric(unlist(lstValue))
 #rcvrID <- 7948   #Bullards Bridge 
 
-
-# Add common utilities
-#####source("modules/common_utils.R")
-
-
-### load the data 
-coastlines <- readOGR("map-data/ne-coastlines-50m/ne_50m_coastline.shp")
-lakes <- readOGR("map-data/ne-lakes-50m/ne_50m_lakes.shp")
-
 # Add individual modules here
 source("modules/ReceiverDetections.R")
 source("modules/tagDeploymentDetails.R")          #tagDeploymentDetails
 source("modules/tagDeploymentDetections.R")       #the flightpath
 source("modules/receiverDeploymentDetections.R")  #whats been at our receiver
 
-
-# Initially populate the dataframes and we want these to be global variables...
+# Initially populate the dataframes here
+# we want these to be global variables... (note the <<- ) 
 detections_df <<- receiverDeploymentDetections(rcvrID)
 detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
