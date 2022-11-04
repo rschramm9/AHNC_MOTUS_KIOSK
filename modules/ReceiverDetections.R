@@ -93,7 +93,7 @@ UI_ReceiverDetections <- function(id, i18n) {
                           # the tabbed panel container height somehow.
                           tags$style(type = "text/css", paste0("#",ns('leaflet_map')), "{height: calc(100vh - 425px) !important;}"),
                           tabPanel(i18n$t("ui_RCVR_detections_leaflet_tab_label"), 
-                                   helpText(i18n$t("ui_RCVR_detections_map_tab_helptext")),
+                                   helpText(i18n$t("ui_RCVR_detections_leaflet_tab_helptext")),
                                    leafletOutput(ns("leaflet_map"), width = "100%", height="100%")
                           ),
                           
