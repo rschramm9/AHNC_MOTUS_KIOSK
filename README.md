@@ -31,6 +31,7 @@ or find it at https://motus.org/policy/
 ### Contributors
 
 * Richard Schramm,  original author
+* Patrick Lorch (leaflet maps)
 
 ### Who can I talk to about it? ###
 
