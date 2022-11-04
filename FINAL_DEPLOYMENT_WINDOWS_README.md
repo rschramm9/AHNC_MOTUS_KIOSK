@@ -80,7 +80,7 @@ Verifiy Settings are:
 
 - "Enable Attract Screen" False (unchecked box)
 - "Enable Full Screen" True (checked box) http://
-- "Enable Redirect Screen" False (unchecked box)
+- "Enable Redirect Screen" True (checked box)
 - "Enable URL Filters" False (unchecked box)
 - Set homepage to : localhost:8081  << this port must agree with the shiny app startup task we will create in next section!
 - "Enable Javascript" True (checked box)
