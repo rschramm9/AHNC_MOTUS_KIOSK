@@ -97,6 +97,7 @@ install.packages("lubridate")
 install.packages("sf")
 install.packages("tidyverse")
 install.packages("DT")
+install.packages("leaflet")
 
 ```
 
