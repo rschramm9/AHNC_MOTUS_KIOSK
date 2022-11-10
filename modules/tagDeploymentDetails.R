@@ -159,9 +159,6 @@ tagDeploymentDetails <- function(tagDeploymentID)
     
   }
   
-  
-  
-  
   ##### check for any pnode containing  ########
   # for numeric tagid can get "No tag deployment found" 
   # for non-numeric tagid can get "No tag deployment ID found")
@@ -194,7 +191,7 @@ tagDeploymentDetails <- function(tagDeploymentID)
   
   tbl1 <- html_table(tbls[[1]],fill=TRUE)
   
-  #message("***** tadDeploymentDetails  tbl1 ******")
+  #message("***** tagDeploymentDetails  tbl1 ******")
   #print(class(tbl1))
   #print(tbl1)
   

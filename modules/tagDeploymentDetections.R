@@ -59,7 +59,10 @@ empty_tagDeploymentDetection_df <- function()
 tagDeploymentDetections <- function(tagDeploymentID) 
 {
 
-url <- paste( c('https://motus.org/data/tagDeploymentDetections?id=',tagDeploymentID) ,collapse="")    
+  #possible detections returns are limited to 100 by default
+  #if so - might try https://motus.org/data/tagDeploymentDetections?id=',tagDeploymentID,'&n=1000' ?
+  #where n is a hidden argument(see page source)
+url <- paste( c('https://motus.org/data/tagDeploymentDetections?id=',tagDeploymentID,'&n=1000') ,collapse="")    
 ##url <- paste( c('https://motus.org/data/tagDeploymentDetections?id=',32025) ,collapse="")
 
 #print(url)

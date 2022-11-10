@@ -98,6 +98,8 @@ install.packages("sf")
 install.packages("tidyverse")
 install.packages("DT")
 install.packages("leaflet")
+install.packages("leaflet.extras2")
+install.packages("sf")
 
 ```
 

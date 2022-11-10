@@ -27,6 +27,8 @@
 #####################
 library(DT)
 
+library(anytime)
+
 UI_ReceiverDetections <- function(id, i18n) {
   
   ns <- NS(id)
@@ -94,6 +96,10 @@ UI_ReceiverDetections <- function(id, i18n) {
                           tags$style(type = "text/css", paste0("#",ns('leaflet_map')), "{height: calc(100vh - 425px) !important;}"),
                           tabPanel(i18n$t("ui_RCVR_detections_leaflet_tab_label"), 
                                    helpText(i18n$t("ui_RCVR_detections_leaflet_tab_helptext")),
+                                   actionButton( ns("fly"),    label = "Fly"),
+                                   actionButton( ns("pause"),  label = "Pause"),
+                                   actionButton( ns("resume"), label = "Resume"),
+                                   actionButton( ns("stop"),   label = "Stop"),
                                    leafletOutput(ns("leaflet_map"), width = "100%", height="100%")
                           ),
                           
@@ -112,12 +118,6 @@ UI_ReceiverDetections <- function(id, i18n) {
 } 
 # end function def for UI_ReceiverDetections
 
-
-
-
-
-
-
 #####################
 #    SERVER PART    #
 #####################
@@ -128,6 +128,42 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
     
     # !!! session$ns is needed to properly address reactive UI elements from the Server function
     ns <- session$ns
+   
+    
+     # icon location an size from kiosk.cfg, set in global.R
+    birdIcon <- makeIcon(
+      iconUrl = strMovingMarkerIcon,
+      iconWidth = numMovingMarkerIconWidth, iconHeight = numMovingMarkerIconHeight,
+      iconAnchorX = 0, iconAnchorY = 0,
+      shadowUrl = strMovingMarkerIcon,
+      shadowWidth = numMovingMarkerIconWidth, shadowHeight = numMovingMarkerIconHeight,
+      shadowAnchorX = 0, shadowAnchorY = 0
+    )
+    
+    ################### methods to control MovingMarkers (bird in flight)
+    observeEvent(input$fly, {
+      proxy <- leafletProxy("leaflet_map")
+      leaflet::invokeMethod(proxy,NULL,"startMoving","movingmarker")
+    })
+    
+    observeEvent(input$pause, {
+      proxy <- leafletProxy("leaflet_map")
+      leaflet::invokeMethod(proxy,NULL,"pauseMoving","movingmarker")
+    })
+    
+    observeEvent(input$resume, {
+      proxy <- leafletProxy("leaflet_map")
+      leaflet::invokeMethod(proxy,NULL,"resumeMoving","movingmarker")
+    })
+    
+    observeEvent(input$stop, {
+      proxy <- leafletProxy("leaflet_map")
+      leaflet::invokeMethod(proxy,NULL,"stopMoving","movingmarker")
+    })
+    
+    #####################################################################
+    
+    
 
     # Some code for UI observers, 
     
@@ -139,10 +175,14 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
           #note <<- is assignment to global variable, also note rcvrID is global
           detections_df <<- receiverDeploymentDetections(rcvrID)  
       }
-       
-      #sort detections so most recent appears at top of list noteice we are woking with a global variable ( <<- )
+
+      #sort detections so most recent appears at top of list notice we are woking with a global variable ( <<- )
       detections_df <<- detections_df[ order(detections_df$tagDetectionDate,decreasing = TRUE), ]
-       
+      
+     # print("=================== detections_df from receiverDeploymentDetections(rcvrID)  ========================")
+     # print(detections_df)
+     # print("================================================================+++++================================")
+      
       #subset the data frame to form a frame with only the columns we want to show
       # note also it's a global assignment 
       detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
@@ -174,6 +214,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
       myTagsToTable()
     }) #end observeEvent for session start
     
+    
     ## requery motus button has been commented out as it was only for testing
     #  observeEvent(input$btnQuery, {
     #   message("**query button pressed ***")
@@ -192,16 +233,11 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
       #s <-  input$mytable_rows_selected
       #print(s)
    
-      print(detections_df)
+
       #see:https://stackoverflow.com/questions/55799093/select-and-display-the-value-of-a-row-in-shiny-datatable   
-      ####output$selectedItem <- renderText({
-      #message("***** row selected 3 ******")
         selectedrowindex <- input$mytable_rows_selected
-        #print(class(selectedrowindex))
-        
         selectedrowindex <- as.numeric(selectedrowindex)
-        #print(selectedrowindex)
-       
+
         selectedrow <- paste(detections_subset_df[selectedrowindex,],collapse = ", ")
         #print(selectedrow)
         
@@ -215,16 +251,12 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
         #print(species)
        
         tagDepID <- detections_subset_df[selectedrowindex,2]
-        #print(class(tagDepID))
-        #print(tagDepID)
-        
-        
-       ### })
-    
-        
+ 
         tagdetails_df <- tagDeploymentDetails(tagDepID)  
-        
-       
+        #print("================== tagdetails_df from tagDeploymentDetails(tagDepId) ======================")
+        #print(tagdetails_df)
+        #print("============================================================================================")
+
         output$tagdetail <- DT::renderDataTable(tagdetails_df,
                                                 selection = "single", 
                                                 options=list(dom = 'Bfrtip',
@@ -233,22 +265,41 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
         ## note this is a local variable assignment
         tagflight_df <- tagDeploymentDetections(tagDepID)
         
+        #add the tag and release point data to the flight path dataset
+        #there has to be a better way but my R convert datetime to date skills arent up to it...
+        releasepoint_df<-tagdetails_df[c("started","species","lat","lon")]
+        my_date<-as_date(releasepoint_df$started)
+        my_site<-"Tagged"
+        my_lat = releasepoint_df$lat
+        my_lon = releasepoint_df$lon
+        tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon)
+        
         #sort flight detections so most recent appears at bottom of the list
         tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
        
-        
-        
         output$flightpath <- DT::renderDataTable(tagflight_df,
                                                  selection = "single", 
                                                  options=list(dom = 'Bfrtip',
-                                                              searching = F
+                                                 searching = F
                                                  ))
      
-        #print("********** tagflight_df ******")
+        #print("================== tagflight_df from tagDeploymentDetections(tagDepId) ======================")
         #print(tagflight_df)
-        #print("********** end tagflight_df *********")     
+        #print("============================================================================================")
         
-     
+        #saveRDS(subset_df, file="subset.RDS")
+        
+        # make a geometry dataframe for the moving marker
+        # this will be our 'coordinate reference system'
+        projcrs <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+        
+        # convert travel_df to a 'simple features dataframe' using the coordinate reference system
+        # with columns: time,geometry
+        # we willl add the markers in constructing the leaflet map
+        flight_sf <<- st_as_sf(x = tagflight_df,                         
+                               coords = c("lon", "lat"),
+                               crs = projcrs)
+
         # labels for leaflet map popups
         label_text <- glue(
           "<b>Name: </b> {tagflight_df$site}<br/>",
@@ -263,7 +314,6 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
           addPolylines(lat= ~lat, lng = ~lon) %>%
           ### enable next line if we want site labels to appear as each new map is rendered
           ### addPopups(lat= ~lat, lng = ~lon, popup = ~site) %>%    
-          
       
           addCircleMarkers(
             lng=~lon,
@@ -284,18 +334,25 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
             stroke=FALSE,
             fillOpacity=0.0,
             popup=label_text
-          )
+          ) %>%
+          
+          #now add the MovingMarker
+          addMovingMarker(data = flight_sf,
+                          movingOptions = movingMarkerOptions(autostart = TRUE, loop = FALSE),
+                          layerId="movingmarker",
+                          duration=10000,
+                          icon = birdIcon,
+                          label="",
+                          popup="")
         
         # render the output object named leaflet_map
         output$leaflet_map = renderLeaflet(myLeafletMap) 
         
-     
     })  # end observeEvent for mytable_rows_selected
-    
 
-  })
+  }) #end moduleServer
 
-}
+}  # end SERVER_ReceiverDetections()
 
 
 

@@ -19,7 +19,7 @@
 # modularized app as described by Eduard Parsadanyan in his article at: 
 # https://www.linkedin.com/pulse/multilanguage-shiny-app-advanced-cases-eduard-parsadanyan/
 # and was learned via exploring his ClinRTools modularized demo found at:
-# https://bitbucket.org/statsconsult/clinrtoolsdemo/src/master/
+# https://bitbucket.org/satsconsult/clinrtoolsdemo/src/master/
 
 # 
 # Dashboard sources all modules

@@ -42,6 +42,10 @@ library(tidyr) #for  web scraping
 
 #### for leaflet map
 library(leaflet)
+library(leaflet.extras2) #for movingmarker
+# movingmarkers needs flight_ df converted f to a 'simple features dataframe'
+#using the coordinate reference system with columns: time,geometry
+library(sf) #for making flightpath for movingmarker
 
 ### glue for building leaflet labels
 library(glue)
@@ -103,23 +107,60 @@ tryCatch(
 configtbl <- data.table(configfrm, key='Key')
 
 #print("******* config table **********")
-#str(configtbl)
+badCfg <- 0  #assume good
 
-strMainLogoFile <- toString(configtbl['MainLogoFile'][1,2])
-#print(strMainLogoFile)
+   strMainLogoFile <- toString(configtbl['MainLogoFile'][1,2])
+   if(strMainLogoFile == "NA") {
+     print("kiosk.cfg missing value for MainLogoFile ")
+     badCfg <- 1
+   }
 
-strMainTitle <- toString(configtbl['MainTitle'][1,2])
-#print(strMainLogoFile)
+    strMainTitle <- toString(configtbl['MainTitle'][1,2])
+    if( strMainTitle == "NA" ) {
+      print("kiosk.cfg missing value for MainTitle ")
+      badCfg <- 1
+    }
 
-# get the value for the key, convert to numeric
-lstValue <- configtbl['MainLogoHeight'][1,2]
-numMainLogoHeight<- as.numeric(unlist(lstValue))
-#print(numMainLogoHeight)
+    # get the value for the key, convert to numeric
+    lstValue <- configtbl['MainLogoHeight'][1,2]
+    if( is.na(lstValue)) {
+      print("kiosk.cfg missing value for MainLogoHeight ")
+      badCfg <- 1
+    }
+    numMainLogoHeight<- as.numeric(unlist(lstValue))
 
-# get the value for the key, convert to numeric
-lstValue <- configtbl['ReceiverID'][1,2]
-rcvrID <- as.numeric(unlist(lstValue))
-#rcvrID <- 7948   #Bullards Bridge 
+    # get the value for the key, convert to numeric
+    lstValue <- configtbl['ReceiverID'][1,2]
+    if( is.na(lstValue)) {
+      print("kiosk.cfg missing value for ReceiverID  ")
+      badCfg <- 1
+    }
+    rcvrID <- as.numeric(unlist(lstValue))
+
+     strMovingMarkerIcon <- toString(configtbl['MovingMarkerIcon'][1,2])
+     if( strMovingMarkerIcon == "NA") {
+       print("kiosk.cfg missing value for MovingMarkerIcon ")
+       badCfg <- 1
+     }
+  
+     lstValue <- configtbl['MovingMarkerIconWidth'][1,2]
+     if( is.na(lstValue)) {
+       print("kiosk.cfg missing value for MovingMarkerIconWidth ")
+       badCfg <- 1
+     }
+     numMovingMarkerIconWidth <- as.numeric(unlist(lstValue))
+ 
+     lstValue <- configtbl['MovingMarkerIconHeight'][1,2]
+     if( is.na(lstValue)) {
+       print("kiosk.cfg missing value for MovingMarkerIconHeight ")
+       badCfg <- 1
+     }
+     numMovingMarkerIconHeight <- as.numeric(unlist(lstValue))
+ 
+    if( badCfg == 1){
+      stop("There is an error in your kiosk cfg file")
+    }
+
 
 # Add individual modules here
 source("modules/ReceiverDetections.R")
@@ -130,4 +171,5 @@ source("modules/receiverDeploymentDetections.R")  #whats been at our receiver
 # Initially populate the dataframes here
 # we want these to be global variables... (note the <<- ) 
 detections_df <<- receiverDeploymentDetections(rcvrID)
+
 detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
