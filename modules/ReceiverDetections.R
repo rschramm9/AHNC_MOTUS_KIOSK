@@ -163,8 +163,6 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
     
     #####################################################################
     
-    
-
     # Some code for UI observers, 
     
     # A non-reactive function that will be available to each user session
@@ -172,16 +170,16 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
      myTagsToTable <- function(x) {
       
       if ( nrow(detections_df) <= 0 ) {
-          #note <<- is assignment to global variable, also note rcvrID is global
-          detections_df <<- receiverDeploymentDetections(rcvrID)  
+          #note <<- is assignment to global variable, also note receiverDeploymentID is global
+          detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
       }
 
       #sort detections so most recent appears at top of list notice we are woking with a global variable ( <<- )
       detections_df <<- detections_df[ order(detections_df$tagDetectionDate,decreasing = TRUE), ]
       
-     # print("=================== detections_df from receiverDeploymentDetections(rcvrID)  ========================")
-     # print(detections_df)
-     # print("================================================================+++++================================")
+     #print("========= detections_df from receiverDeploymentDetections(receiverDeploymentID)  ====================")
+     #print(detections_df)
+     #print("================================================================+++++================================")
       
       #subset the data frame to form a frame with only the columns we want to show
       # note also it's a global assignment 
