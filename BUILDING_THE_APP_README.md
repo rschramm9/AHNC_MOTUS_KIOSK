@@ -204,16 +204,16 @@ Two other things to observe...
 
 #### 8.0 - Configuration ####
 
-##### 8.1 - Locate your site's motus receiver ID.
+##### 8.1 - Locate your site's motus receiver deployment ID.
 
-To locate  your receiver's ID:  Go to motus.org Then : ExploreData>Projects
+To locate  your receiver's deployment ID:  Go to motus.org Then : ExploreData>Projects
 
-Find your ProjectID, then click on the link that takes you to your project's description.  Look for the item named "Receivers" and click the link next to it saying ""(Table)"
+Find your ProjectID, then click on the link that takes you to your project's description.  Look for the item named "Receivers" and click the link next to it saying ""(Table)". Locate the ID# for your active receiver deployment.  ( NOTE: a Receiver may have multiple Deployments - we are looking for the currently active deploymentID, (not the receiverID) )
 
 ##### 8.2 - Make your own configuration file using your receiver ID.
 
 In the project's top-level directory is a file called sample.cfg  It contains the default set of key value pairs
-that do things like set the target motus receiver using its Motus database ID.
+that do things like set the target motus receiver deployment using its Motus database ID.
 
 The contents of the ***sample.cfg*** file are shown. *Please dont modify this file* - create your own kiosk.cfg file as described below.
 
@@ -224,10 +224,13 @@ The contents of the ***sample.cfg*** file are shown. *Please dont modify this fi
 * Restart the web application.
 
 ```code
-ReceiverID=7948
+ReceiverDeploymentID=9195
 MainLogoFile="images/logos/ankenyhill_logo.png"
 MainLogoHeight=140
-MainTitle="Test Data"
+MainTitle="Ankeny Hill Motus Receiver"
+MovingMarkerIcon="images/icons/icons8-bird-67.png"
+MovingMarkerIconWidth=22
+MovingMarkerIconHeight=22
 ```
 
 
