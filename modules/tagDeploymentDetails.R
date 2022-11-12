@@ -80,8 +80,8 @@ tagDeploymentDetails <- function(tagDeploymentID)
   
   url <- paste( c('https://motus.org/data/tagDeployment?id=',tagDeploymentID) ,collapse="")    
   ##url <- paste( c('https://motus.org/data/tagDeployment?id=',32025) ,collapse="")
-  message("***** tadDeploymentDetails 1 ******")
-  print(url)
+  #message("***** tagDeploymentDetails 1 ******")
+  #print(url)
   
   readUrl <- function(url) {
     out <- tryCatch(
