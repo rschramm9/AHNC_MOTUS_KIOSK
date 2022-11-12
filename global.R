@@ -67,7 +67,7 @@ tryCatch(
     # use assign so you can access the variable outside of the function
     assign("configfrm", read.table(file='kiosk.cfg',header=FALSE,
                                    sep='=',col.names=c('Key','Value')), envir=.GlobalEnv) 
-    print("Loaded installation data from local storage")
+    print("Loaded configuration data from local file kiosk.cfg")
   },
   warning = function( w )
   {
@@ -76,7 +76,8 @@ tryCatch(
   error = function( err ) 
   {
     print("Could not read cfg data from current directory, using defaults...")
-    
+    print("here is the err returned by the read:")
+    print(err)
     #attempt to read from alternate template
     tryCatch(
       {
@@ -93,7 +94,10 @@ tryCatch(
       },
       error = function( err )
       {
-        print("Could not load configuration data. Exiting Program")
+        print("Config file read error: Could not load configuration data. Exiting Program")
+        print("here is the err returned by the read:")
+        print(err)
+        stop("There is an error reading your cfg file")
       }
     )
     
@@ -130,12 +134,12 @@ badCfg <- 0  #assume good
     numMainLogoHeight<- as.numeric(unlist(lstValue))
 
     # get the value for the key, convert to numeric
-    lstValue <- configtbl['ReceiverID'][1,2]
+    lstValue <- configtbl['ReceiverDeploymentID'][1,2]
     if( is.na(lstValue)) {
-      print("kiosk.cfg missing value for ReceiverID  ")
+      print("kiosk.cfg missing value for ReceiverDeploymentID  ")
       badCfg <- 1
     }
-    rcvrID <- as.numeric(unlist(lstValue))
+    receiverDeploymentID <- as.numeric(unlist(lstValue))
 
      strMovingMarkerIcon <- toString(configtbl['MovingMarkerIcon'][1,2])
      if( strMovingMarkerIcon == "NA") {
@@ -170,6 +174,10 @@ source("modules/receiverDeploymentDetections.R")  #whats been at our receiver
 
 # Initially populate the dataframes here
 # we want these to be global variables... (note the <<- ) 
-detections_df <<- receiverDeploymentDetections(rcvrID)
+     
+#print("======== in global.R  try to load detectionf_df ========")
+detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
+#print (detections_df)
+#print("============================================")
 
 detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
