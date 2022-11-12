@@ -55,7 +55,7 @@ empty_receiverDeploymentDetection_df <- function()
 
 ################################################################################
 # Purpose: function for getting all tag detections at receiver given
-# the MOTUS receiver deployment ID.
+# the MOTUS receiverDeployment ID.
 # eg https://motus.org/data/receiverDeploymentDetections?id=7948
 #
 # Info: Build the URL and submit to motus. Process the returns to scrape
@@ -67,12 +67,15 @@ empty_receiverDeploymentDetection_df <- function()
 # empty_receiverdetection_df()
 #
 ################################################################################
-receiverDeploymentDetections <- function(receiverID) 
+receiverDeploymentDetections <- function(rcvrDepID) 
 {
   #url <- paste( c('https://motus.org/data/receiverDeploymentDetections?id=7948') ,collapse="")
-  url <- paste( c('https://motus.org/data/receiverDeploymentDetections?id=', receiverID) ,collapse="")
+  #possible detections returns are limited to 100 by default
+  #if so - might try https://motus.org/data/receiverDeploymentDetections?id=',tagDeploymentID,'&n=1000' ?
+  #where n is a hidden argument(see page source)
+  url <- paste( c('https://motus.org/data/receiverDeploymentDetections?id=', rcvrDepID,'&n=1000') ,collapse="")
   #print(url)
-  
+  #print("==================== in receiverDeploymentDetections() ==========================")
   readUrl <- function(url) {
     out <- tryCatch(
       {
@@ -163,15 +166,27 @@ receiverDeploymentDetections <- function(receiverID)
   tbl1 <- html_table(tbls[[1]],fill=TRUE)
   num.cols<-dim(tbl1)[2]
   num.rows<-dim(tbl1)[1]
-  ##print(dim(tbl1))
+  #print ("dim(tbl1):")
+  #print(dim(tbl1))
+  #print("numrows:")
+  #print(num.rows)
+  #print ("numcols:")
+  #print(num.cols)
   
   #for(i in 1:num.rows){
-   ##print(i)
-  #  print( tbl1[[1]][i] ) 
-  #  print( tbl1[[2]][i] )
-  #  print( tbl1[[3]][i]  )
-  #  print( tbl1[[4]][i] )
+   #print("for row i:")
+   #print(i)
+   #print ("----------------------------")
+    #print( tbl1[[1]][i] ) 
+    #print( tbl1[[2]][i] )
+    #print( tbl1[[3]][i]  )
+    #print( tbl1[[4]][i] )
+    #print( tbl1[[5]][i] )
+    #print( tbl1[[6]][i] )
+    #print ("----------------------------")
   #}
+  #print("class tbl1:")
+  #print(class(tbl1[[1]][i])) 
   
   
   # create empty 'vectors'
@@ -183,14 +198,24 @@ receiverDeploymentDetections <- function(receiverID)
   lon<-c()
   tagDeploymentID<-c()
   
-  #> print(class(tbl1[[1]][i]))  
+ 
   #[1] "character"
   # table entries are all class "character"
   n <- 0
   
+
+  # table has a row of sort controls as a 'table footer' if more than one row
+  # in the html results table, if nrows = 1 then there is no table footer.
+  # So here we set the number of true detection records to process in the
+  # for loop that follows
+  if(num.rows == 1){
+    nrecords <- 1
+  } else {
+    nrecords <- num.rows -1
+  }
+  
   #build six vectors from table data for text in each cell
-  #need to go nrows-1 so dont extract the 'table footer' row
-  for(i in 1:num.rows-1){
+  for(i in 1:nrecords){
     n <- n+1
     tagDetectionDate <- c( tagDetectionDate,  tbl1[[1]][i]  )
     tagDeploymentName <- c( tagDeploymentName,  tbl1[[2]][i] )
