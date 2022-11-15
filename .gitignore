@@ -47,3 +47,6 @@ rsconnect/
 
 #the local kiosk.cfg file
 kiosk.cfg
+
+#the Logs directory
+Logs/*.txt
