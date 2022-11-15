@@ -33,3 +33,7 @@ ui_RCVR_labelinfo|Ingrese la información de la etiqueta aquí. Las etiquetas qu
 ui_RCVR_input_requery_label_help_text|Vuelva a consultar el servidor MOTUS
 ui_RCVR_input_requery_button_caption|Consulta Motus
 
+ui_RCVR_fly_button_caption|Volar
+ui_RCVR_stop_button_caption|Deténgase
+ui_RCVR_pause_button_caption|Pausa
+ui_RCVR_resume_button_caption|Reanudar

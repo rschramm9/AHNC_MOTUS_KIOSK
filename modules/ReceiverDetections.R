@@ -96,10 +96,11 @@ UI_ReceiverDetections <- function(id, i18n) {
                           tags$style(type = "text/css", paste0("#",ns('leaflet_map')), "{height: calc(100vh - 425px) !important;}"),
                           tabPanel(i18n$t("ui_RCVR_detections_leaflet_tab_label"), 
                                    helpText(i18n$t("ui_RCVR_detections_leaflet_tab_helptext")),
-                                   actionButton( ns("fly"),    label = "Fly"),
-                                   actionButton( ns("pause"),  label = "Pause"),
-                                   actionButton( ns("resume"), label = "Resume"),
-                                   actionButton( ns("stop"),   label = "Stop"),
+                                   actionButton( ns("fly"),    label = i18n$t("ui_RCVR_fly_button_caption")),
+                                   actionButton( ns("stop"),   label = i18n$t("ui_RCVR_stop_button_caption")),
+                                   actionButton( ns("pause"),  label = i18n$t("ui_RCVR_pause_button_caption")),
+                                   actionButton( ns("resume"), label = i18n$t("ui_RCVR_resume_button_caption")),
+                                   
                                    leafletOutput(ns("leaflet_map"), width = "100%", height="100%")
                           ),
                           
