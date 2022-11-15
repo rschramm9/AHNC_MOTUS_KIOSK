@@ -61,6 +61,15 @@ default_UI_lang <- "en"
 ###### read configuration key/value pairs
 library(data.table)
 
+
+# Add individual modules here
+source("modules/utility_functions.R")
+source("modules/ReceiverDetections.R")
+source("modules/tagDeploymentDetails.R")          #tagDeploymentDetails
+source("modules/tagDeploymentDetections.R")       #the flightpath
+source("modules/receiverDeploymentDetections.R")  #whats been at our receiver
+
+
 tryCatch( 
   {  
     #attempt to read file from current directory
@@ -109,69 +118,113 @@ tryCatch(
 #str(configfrm)
 
 configtbl <- data.table(configfrm, key='Key')
+print("---------  The configtbl ------------")
+print(configtbl)
+print("-------------------------------------")
 
-#print("******* config table **********")
-badCfg <- 0  #assume good
+badCfg <- 0  #assume good config
 
-   strMainLogoFile <- toString(configtbl['MainLogoFile'][1,2])
-   if(strMainLogoFile == "NA") {
-     print("kiosk.cfg missing value for MainLogoFile ")
-     badCfg <- 1
-   }
-
-    strMainTitle <- toString(configtbl['MainTitle'][1,2])
-    if( strMainTitle == "NA" ) {
-      print("kiosk.cfg missing value for MainTitle ")
-      badCfg <- 1
+    #print("------------ MainLogoFile ----------------")
+    list1 <- keyValueToList(configtbl,'MainLogoFile')
+    if( is.null(list1) ){
+     badCfg <- 1 
+     strMainLogoFile<-NULL
+    } else {
+     #I ultimately want a string
+     strMainLogoFile<- toString(list1[1])  
     }
-
-    # get the value for the key, convert to numeric
-    lstValue <- configtbl['MainLogoHeight'][1,2]
-    if( is.na(lstValue)) {
-      print("kiosk.cfg missing value for MainLogoHeight ")
-      badCfg <- 1
-    }
-    numMainLogoHeight<- as.numeric(unlist(lstValue))
-
-    # get the value for the key, convert to numeric
-    lstValue <- configtbl['ReceiverDeploymentID'][1,2]
-    if( is.na(lstValue)) {
-      print("kiosk.cfg missing value for ReceiverDeploymentID  ")
-      badCfg <- 1
-    }
-    receiverDeploymentID <- as.numeric(unlist(lstValue))
-
-     strMovingMarkerIcon <- toString(configtbl['MovingMarkerIcon'][1,2])
-     if( strMovingMarkerIcon == "NA") {
-       print("kiosk.cfg missing value for MovingMarkerIcon ")
-       badCfg <- 1
-     }
+    #print(paste0("MainLogoFile:", strMainLogoFile))
   
-     lstValue <- configtbl['MovingMarkerIconWidth'][1,2]
-     if( is.na(lstValue)) {
-       print("kiosk.cfg missing value for MovingMarkerIconWidth ")
-       badCfg <- 1
-     }
-     numMovingMarkerIconWidth <- as.numeric(unlist(lstValue))
- 
-     lstValue <- configtbl['MovingMarkerIconHeight'][1,2]
-     if( is.na(lstValue)) {
-       print("kiosk.cfg missing value for MovingMarkerIconHeight ")
-       badCfg <- 1
-     }
-     numMovingMarkerIconHeight <- as.numeric(unlist(lstValue))
- 
-    if( badCfg == 1){
-      stop("There is an error in your kiosk cfg file")
+    #print("------------ MainTitle ----------------")
+    list1 <- keyValueToList(configtbl,'MainTitle')
+    if( is.null(list1) ){
+      badCfg <- 1 
+      strMainTitle<-NULL
+    } else {
+      #I ultimately want a string
+      strMainTitle<- toString(list1[1])  
     }
+    #print(paste0("MainTitle:",strMainTitle))
+    
+    
+    #print("------------ MainLogoHeight --------------")
+    list1 <- keyValueToList(configtbl,'MainLogoHeight')
+    if( is.null(list1) ){
+      badCfg <- 1 
+      numMainLogoHeight <- NULL
+    } else {
+      numMainLogoHeight <- as.numeric(list1[1]) #assume length=1
+    }
+    #print(paste0("MainLogoHeight:",numMainLogoHeight))
+    
 
+    #print("------------ ReceiverDeploymentID --------------")
+    #for now assume its length=1, but later we may want to support many
+    list1 <- keyValueToList(configtbl,'ReceiverDeploymentID')
+    if( is.null(list1) ){
+      badCfg <- 1 
+      receiverDeploymentID <- NULL
+    } else {
+      receiverDeploymentID <- as.numeric(list1[1]) #assume length=1
+    }
+    #print(paste0("ReceiverDeploymentID:",receiverDeploymentID))
+    
+    
+     #print("------------ MovingMarkerIcon ----------------")
+     list1 <- keyValueToList(configtbl,'MovingMarkerIcon')
+     if( is.null(list1) ){
+       badCfg <- 1 
+       strMovingMarkerIcon<-NULL
+     } else {
+       #I ultimately want a string
+       strMovingMarkerIcon<- toString(list1[1])  
+     }
+     #print(paste0("MovingMarkerIcon:",strMovingMarkerIcon))
+     
+  
+     #print("------------ MovingMarkerIconWidth --------------")
+     list1 <- keyValueToList(configtbl,'MovingMarkerIconWidth')
+     if( is.null(list1) ){
+       badCfg <- 1 
+       numMovingMarkerIconWidth<-NULL
+     } else {
+       numMovingMarkerIconWidth <- as.numeric(list1[1]) #assume length=1
+     }
+     #print(paste0("MovingMarkerIconWidth:",numMovingMarkerIconWidth))
+     
+     
+     #print("------------ MovingMarkerIconHeight --------------")
+     list1 <- keyValueToList(configtbl,'MovingMarkerIconHeight')
+     if( is.null(list1) ){
+       badCfg <- 1 
+       numMovingMarkerIconHeight<-NULL
+     } else {
+       numMovingMarkerIconHeight<- as.numeric(list1[1]) #assume length=1
+     }
+     #print(paste0("MovingMarkerIconHeight:",numMovingMarkerIconHeight))
+     
 
-# Add individual modules here
-source("modules/ReceiverDetections.R")
-source("modules/tagDeploymentDetails.R")          #tagDeploymentDetails
-source("modules/tagDeploymentDetections.R")       #the flightpath
-source("modules/receiverDeploymentDetections.R")  #whats been at our receiver
-
+     #print("------------ ReceiverShortName ----------------")
+     #for now assume its length=1, but later we may want to support many
+     list1 <- keyValueToList(configtbl,'ReceiverShortName')
+     if( is.null(list1) ){
+       badCfg <- 1
+       strReceiverShortName<-NULL
+     } else {
+         #I ultimately want a string
+         strReceiverShortName<- toString(list1[1])  
+     }
+     #print(paste0("ReceiverShortName:",strReceiverShortName))
+     
+     #print("-----------------Done processing config----------------------------------")
+     
+     
+     #halt if config processing didn't finish cleanly
+     if( badCfg == 1){
+       stop("There is an error in your kiosk cfg file")
+     }
+     
+     
 # Initially populate the dataframes here
 # we want these to be global variables... (note the <<- ) 
      
