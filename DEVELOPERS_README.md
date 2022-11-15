@@ -171,3 +171,47 @@ which is good. Most packages are not "stand-alone", they use other packages too,
 You can look at the CRAN page for `readr`: [https://CRAN.R-project.org/package=readr](https://cran.r-project.org/package=readr) to see its dependencies (anything in the "Depends" or "Imports" fields is required). And of course you need the dependencies of those dependencies, etc. Now that `readr` is installed along with its dependencies, you can run `library(readr)` to load it.
 
  
+
+Leaflet.extras2 packages failing to load issue - 12Nov-22
+
+The ankeny windows nuc was having fits starting in the TaskScheduler.  Everything loaded fine in R-Studio and R console
+
+It was complaining that it was compiled for 4.2.2 but we are running 4.2.1
+
+So **I updated R and RStudio following this:**
+
+https://www.linkedin.com/pulse/3-methods-update-r-rstudio-windows-mac-woratana-ngarmtrakulchol/
+
+```
+Solution 2) Windows only – use installr
+installr is the R package which helps install and update software.
+The R code you will need for updating R is: (credit goes to Cara Wogsland for the code)
+
+install.packages("installr")
+library(installr)
+updateR()
+
+```
+
+```
+Solution 3) Mac only – use updateR
+Similar to installr, updateR is the package to help updating R on Mac OS.
+
+The R code you will need is these 5 lines: (credit goes to jroberayalas for the code)
+
+install.packages('devtools') #assuming it is not already installed
+library(devtools)
+install_github('andreacirilloac/updateR')
+library(updateR)
+updateR(admin_password = 'Admin user password')
+```
+
+THe above failed on my MacBook - library(updateR) couldnt find updateR 
+
+see also:: http://www.andreacirillo.com/2018/03/10/updater-package-update-r-version-with-a-function-on-mac-osx/
+
+https://bootstrappers.umassmed.edu/bootstrappers-courses/courses/rCourse/Additional_Resources/Updating_R.html
+
+https://bootstrappers.umassmed.edu/bootstrappers-courses/courses/rCourse/Additional_Resources/Updating_R.html
+
+WINDOWSWINDOWTask to run the Motus Kiosk 
