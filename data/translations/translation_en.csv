@@ -11,6 +11,7 @@ ui_app_common_envirpanel|Environment version
 ui_app_common_outpanel|Output
 
 ui_mainpage_lang|Select UI language
+ui_mainpage_available_receivers|Available Receivers
 ui_mainpage_loading|Loading...
 ui_mainpage_readmefile|www/docs/homepage_readme_en.html
 
@@ -39,3 +40,6 @@ ui_RCVR_fly_button_caption|Fly
 ui_RCVR_stop_button_caption|Stop
 ui_RCVR_pause_button_caption|Pause
 ui_RCVR_resume_button_caption|Resume
+
+species_ui_loading|Species page loading
+species_unknown|www/docs/species_unknown_en.html

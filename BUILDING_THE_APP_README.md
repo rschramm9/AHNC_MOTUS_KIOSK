@@ -223,12 +223,28 @@ The contents of the ***sample.cfg*** file are shown. *Please dont modify this fi
 
 * Restart the web application.
 
+  ***NOTE: 8.2.1 NEW Begining with Release 3.0.0 You now configure your kiosk for browsing multiple receivers.  Below shows the new configuration for a single receiver, below that shows a sample configuration for multiple receivers.***
+
 ```code
 ReceiverDeploymentID=9195
+ReceiverShortName="Ankeny Hill OR"
 MainLogoFile="images/logos/ankenyhill_logo.png"
 MainLogoHeight=140
 MainTitle="Ankeny Hill Motus Receiver"
-MovingMarkerIcon="images/icons/icons8-bird-67.png"
+MovingMarkerIcon="images/icons/motus-bird.png"
+MovingMarkerIconWidth=22
+MovingMarkerIconHeight=22
+```
+
+
+
+```code
+ReceiverDeploymentID=9195,7948,8691,7474,7950
+ReceiverShortName="Ankeny Hill OR", "Bullards Bridge OR", "Nisqually Delta WA", "Oysterville WA", "Tokeland WA"
+MainLogoFile="images/logos/ankenyhill_logo.png"
+MainLogoHeight=140
+MainTitle="Ankeny Hill Motus Receiver"
+MovingMarkerIcon="images/icons/motus-bird.png"
 MovingMarkerIconWidth=22
 MovingMarkerIconHeight=22
 ```
@@ -248,6 +264,18 @@ There is one file for each languge that the application supports - currently:
 Edit these two files carefully with an html editor or a text editor of your choice. 
 
 Someplace visible in your kiosk you *must* give proper credit to the Motus folks and Birds Canada and should include a statement regarding Acceptable Use.  I have chosen to put that in the section "Credits" on the "Home" screen. 
+
+**WARNING:** Teaching html document structure is beyond the scope of this documentation.  Be careful to maintain correct opening and closing html tags and verify that your changes render correctly in an html browser such as firefox or chrome before replacing the existing files.
+
+##### 8.4 - Configure your own "Species" tab content
+
+The descriptive content that appears in the in the in the "Species" tab when ever a new animal is selcted comes from a language dependent .html file in the  project sub-directory www/docs.
+
+There should be a files for each species you want to describe, one in each language you wish to support/
+
+File name choice is critical.  The software builds a compacted lowercay 'key' using the motus species name field and tries to match that to a file in this directory.  
+
+To add your own species files, copy any pair of files to use as templates and edit them carefully with an html editor or a text editor for the species of your choice. Save them using the filename pattern described above.
 
 **WARNING:** Teaching html document structure is beyond the scope of this documentation.  Be careful to maintain correct opening and closing html tags and verify that your changes render correctly in an html browser such as firefox or chrome before replacing the existing files.
 

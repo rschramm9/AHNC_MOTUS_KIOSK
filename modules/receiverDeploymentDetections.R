@@ -135,20 +135,17 @@ receiverDeploymentDetections <- function(rcvrDepID)
   #print(pnodes[1])
   #print(pnodes[2])
   
-  
-  
   ##### check for any pnode containing the following ########
   #for numeric receiver id can get: No receiver deployment found with ID = 7
   #for non numeric receiver id can get: No receiver deployment ID found
   
-  # note.. turn off warnings tha str_detects about
-  #  argument is not an atomic vector; coercing
+  # note.. turn off warnings that str_detects warns
+  #  "argument is not an atomic vector; coercing.."
   
   warn = getOption("warn")
   options(warn=-1)
   ans <- str_detect( pnodes, "No receiver deployment" )
   options(warn=warn)
-  
   
   newans <- any(ans, na.rm = TRUE)  #collapse vector to one element
 
@@ -166,28 +163,22 @@ receiverDeploymentDetections <- function(rcvrDepID)
   tbl1 <- html_table(tbls[[1]],fill=TRUE)
   num.cols<-dim(tbl1)[2]
   num.rows<-dim(tbl1)[1]
-  #print ("dim(tbl1):")
-  #print(dim(tbl1))
-  #print("numrows:")
-  #print(num.rows)
-  #print ("numcols:")
-  #print(num.cols)
-  
-  #for(i in 1:num.rows){
-   #print("for row i:")
-   #print(i)
-   #print ("----------------------------")
-    #print( tbl1[[1]][i] ) 
-    #print( tbl1[[2]][i] )
-    #print( tbl1[[3]][i]  )
-    #print( tbl1[[4]][i] )
-    #print( tbl1[[5]][i] )
-    #print( tbl1[[6]][i] )
-    #print ("----------------------------")
-  #}
-  #print("class tbl1:")
-  #print(class(tbl1[[1]][i])) 
-  
+#  print ("dim(tbl1):")
+#  print(dim(tbl1))
+#  print("numrows:")
+#  print(num.rows)
+#  print ("numcols:")
+#  print(num.cols)
+#  for(i in 1:num.rows){
+#    print(paste0("------------ for row i:",i," --------------"))
+#    print( tbl1[[1]][i] ) 
+#    print( tbl1[[2]][i] )
+#    print( tbl1[[3]][i]  )
+#    print( tbl1[[4]][i] )
+#    print( tbl1[[5]][i] )
+#    print( tbl1[[6]][i] )
+#  } # end for
+
   
   # create empty 'vectors'
   tagDetectionDate<-c()
@@ -204,14 +195,16 @@ receiverDeploymentDetections <- function(rcvrDepID)
   n <- 0
   
 
-  # table has a row of sort controls as a 'table footer' if more than one row
-  # in the html results table, if nrows = 1 then there is no table footer.
-  # So here we set the number of true detection records to process in the
+  # html results node may have a 'row' of sort controls as a 'table footer' 
+  # if it is there, then the first column of the last row will be the
+  # string 'Detection date'
+  # We need the true number of detection records to process in the
   # for loop that follows
-  if(num.rows == 1){
-    nrecords <- 1
-  } else {
+  hasFooter <- str_detect( tbl1[[1]][num.rows], "Detection date" )
+  if(hasFooter == 1){
     nrecords <- num.rows -1
+  } else {
+    nrecords <- num.rows
   }
   
   #build six vectors from table data for text in each cell
@@ -235,8 +228,8 @@ receiverDeploymentDetections <- function(rcvrDepID)
   lon <- as.numeric(lon)
   
   # ----------------------------------------------------------
-  #process the page a second time for the tagDeploymentID's that
-  #are embedded in the anchor tag of the tagDeploymentName cells.
+  # process the page a second time for the tagDeploymentID's that
+  # are embedded in the anchor tag of the tagDeploymentName cells.
   # get all the table rows, with <a href=
   a_nodes <- page %>%
   html_nodes("table") %>% html_nodes("tr") %>% html_nodes("a") %>%
@@ -269,7 +262,7 @@ receiverDeploymentDetections <- function(rcvrDepID)
   df <-data.frame(tagDetectionDate,tagDeploymentID,tagDeploymentName,species,tagDeploymentDate,lat,lon)
   #delete nulls
   df <- df %>% drop_na()
-  print(df)
+  #print(df)
   return(df)
   
 }

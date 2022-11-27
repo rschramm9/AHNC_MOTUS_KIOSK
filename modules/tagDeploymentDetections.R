@@ -66,6 +66,9 @@ url <- paste( c('https://motus.org/data/tagDeploymentDetections?id=',tagDeployme
 ##url <- paste( c('https://motus.org/data/tagDeploymentDetections?id=',32025) ,collapse="")
 
 #print(url)
+#print(" ----------- entered tagDeplymentDetections.R -------")
+#print(paste0("using tagDeploymentID:",tagDeploymentID))
+
 
 readUrl <- function(url) {
   out <- tryCatch(
@@ -109,13 +112,10 @@ if( is.na(result)){
   df <- empty_tagDeploymentDetection_df()
   print("*** tagDeploymentDetections returning empty df ***")
   return(df)
-  
 }
 
 page <- result[[1]]
 #print(class(page))
-
-
 
 #get all the <p> nodes and look for warnings
 pnodes <- html_nodes(page, "p")

@@ -68,7 +68,7 @@ UI_ReceiverDetections <- function(id, i18n) {
                    DT::dataTableOutput( ns('mytable') )
                    
       ),
-       mainPanel(width = 8,
+      mainPanel(width = 8,
               
               tabsetPanel(type = "tabs",
                           tabPanel(i18n$t("ui_RCVR_detections_details_tab_label"), 
@@ -105,31 +105,33 @@ UI_ReceiverDetections <- function(id, i18n) {
                           ),
                           
                           # TODO: enable this for a future spcies tab
-                          #   tabPanel(i18n$t("ui_RCVR_detections_species_tab_label"), 
-                          #            helpText(i18n$t("ui_RCVR_detections_species_tab_helptext")),
-                          #            ##tableOutput(ns('species_out'))
-                          #            
-                          #   ),
-                          
+                         tabPanel( i18n$t("ui_RCVR_detections_species_tab_label"), 
+                                    # helpText(i18n$t("ui_RCVR_detections_species_tab_helptext")),
+                                    htmlOutput(ns("species"))
+               
+                          ) #end tabPanel species
+        
               ) #end tabsetPanel            
        ) #end mainPanel
     ) # end sidebarLayout
   ) #end fluidPage
-  
-} 
-# end function def for UI_ReceiverDetections
+}  # end function def for UI_ReceiverDetections
 
 #####################
 #    SERVER PART    #
 #####################
 
-SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
+SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
   
    moduleServer(id, function(input, output, session) {
     
     # !!! session$ns is needed to properly address reactive UI elements from the Server function
     ns <- session$ns
-   
+    
+    #print("-----Initial selected species - module global scope -------------------")
+    selected_species <- "unknown"
+    species_key <- "unknown"
+ 
     
      # icon location an size from kiosk.cfg, set in global.R
     birdIcon <- makeIcon(
@@ -165,28 +167,53 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
     #####################################################################
     
     # Some code for UI observers, 
-    
+
     # A non-reactive function that will be available to each user session
     # populate detections_df and detections_subset_df as needed and render to sidebar table
-     myTagsToTable <- function(x) {
-      
-      if ( nrow(detections_df) <= 0 ) {
-          #note <<- is assignment to global variable, also note receiverDeploymentID is global
-          detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
-      }
+    
+    #-------------------------------------------------------------------------------------------------------------
+    #   
+    #------------------------------------------------------------------------------------------------------------- 
+    #function to take the species key and the current language setting and try
+    #to load a species info html file containiong a photo and some interesting facts
+    #about the currently selected bird 
+    updateSpeciesInfo <- function() {    
+   
+    #file like "/Users/rich/Projects/AHNC_MOTUS_KIOSK/www/docs/species_unknown_en.html") 
 
-      #sort detections so most recent appears at top of list notice we are woking with a global variable ( <<- )
-      detections_df <<- detections_df[ order(detections_df$tagDetectionDate,decreasing = TRUE), ]
-      
-     #print("========= detections_df from receiverDeploymentDetections(receiverDeploymentID)  ====================")
-     #print(detections_df)
-     #print("================================================================+++++================================")
-      
-      #subset the data frame to form a frame with only the columns we want to show
-      # note also it's a global assignment 
-      detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
-      
-      output$mytable <- DT::renderDataTable(detections_subset_df,
+    #get the default 'species_unknown' html filename matching the current language    
+    xxx <- i18n_r()$t("species_unknown")  
+    #substitute the word 'unknown' in the filename with the species key
+    yyy <- str_replace(xxx,"unknown",species_key)
+
+    #if the species-specific file exists, use it, else use the species unknown file
+    if (file.exists(yyy)) {
+      zzz <- includeHTML(yyy)
+    } else {
+      zzz <- includeHTML(xxx)
+    }
+    
+    output$species <- renderUI(zzz)
+   } #end updateSpeciesInfo()
+    
+    #-------------------------------------------------------------------------------------------------------------
+    #   
+    #-------------------------------------------------------------------------------------------------------------  
+   # A non-reactive function that will be available to each user session
+   # populate global detections_df and detections_subset_df as needed and render to sidebar table
+   myTagsToTable <- function(x) {
+
+   #note <<- is assignment to global variable, also note receiverDeploymentID is global
+   detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
+
+   #sort detections so most recent appears at top of list notice we are woking with a global variable ( <<- )
+   detections_df <<- detections_df[ order(detections_df$tagDetectionDate,decreasing = TRUE), ]
+
+   #subset the data frame to form a frame with only the columns we want to show
+   # note also it's a global assignment 
+   detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
+         
+   output$mytable <- DT::renderDataTable(detections_subset_df,
                                             selection = list(mode = 'single',
                                             selected = c(1) ),
                                             extensions = c('ColReorder', 'FixedHeader', 'Scroller'),
@@ -206,87 +233,129 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
                                                          scrollX = TRUE,
                                                          scrollY = 700
                                             ))
-    }
+    } # end function myTagsToTable
 
+   #-------------------------------------------------------------------------------------------------------------
+   #   
+   #-------------------------------------------------------------------------------------------------------------  
+     
     observeEvent( session$clientData, {
-        #  message("**session started ***")
+      #  message("**session started ***")
       myTagsToTable()
     }) #end observeEvent for session start
     
-    
+    #-------------------------------------------------------------------------------------------------------------
+    #   
+    #-------------------------------------------------------------------------------------------------------------    
     ## requery motus button has been commented out as it was only for testing
     #  observeEvent(input$btnQuery, {
     #   message("**query button pressed ***")
     #   myTagsToTable()
     #  }) #end observeEvent for for requery button
     
+    
+    #-------------------------------------------------------------------------------------------------------------
+    #   
+    #------------------------------------------------------------------------------------------------------------- 
     # Some UI elements should be updated on the Server side:
     # Update text values when language is changed
+    #note lang() is handle to the language input picklist passed in from server.R
     observeEvent(lang(), {
       i18n_r()$set_translation_language(lang())
-    })
+      updateSpeciesInfo()
+    }) #end observeEvent(lang()
     
+    #-------------------------------------------------------------------------------------------------------------
+    #   
+    #------------------------------------------------------------------------------------------------------------- 
     observeEvent(input$mytable_rows_selected,{
-      #message("***** row selected 1 ******")
-      #print(!is.null(input$mytable_rows_selected))
-      #s <-  input$mytable_rows_selected
-      #print(s)
-   
 
       #see:https://stackoverflow.com/questions/55799093/select-and-display-the-value-of-a-row-in-shiny-datatable   
         selectedrowindex <- input$mytable_rows_selected
         selectedrowindex <- as.numeric(selectedrowindex)
-
         selectedrow <- paste(detections_subset_df[selectedrowindex,],collapse = ", ")
-        #print(selectedrow)
-        
-        #biggerrow <- paste(detections_df[selectedrowindex,],collapse = ", ")
-        #print(biggerrow)
-        ## 'tagDetectionDate','tagDeploymentID','tagDeploymentName','species','tagDeploymentDate','lat','lon')
-        ##selectedrow
-        #print(class(biggerrow))
-        #species <- biggerrow[[4]]
-        #species <- paste(detections_df[selectedrowindex,4],collapse = ", ")
-        #print(species)
-       
+    
+        #this could return NA is the subset is empty... we will have to trap
+        #those below by testing this value
         tagDepID <- detections_subset_df[selectedrowindex,2]
  
-        tagdetails_df <- tagDeploymentDetails(tagDepID)  
-        #print("================== tagdetails_df from tagDeploymentDetails(tagDepId) ======================")
-        #print(tagdetails_df)
-        #print("============================================================================================")
-
+        #updating the species information tab.
+        #when a new row is selected in the tag deployments table
+        #extract the selected species name and see if we can build a species name 'key'
+        #that updateSpeciesInfo() can substitute into the default 'species_unknown_xx,html'
+        #filename to pull in a new html file documenting the the species.
+        # NOTE: global assignment operator as species_key is needed outside of this
+        # functions scope 
+        
+        #get the selected species and strip unwanted chars and then lowercase() it
+        #e.g."Swainson's Thrush" becomes key = "swainsonsthrush"
+        selected_species <- detections_subset_df[selectedrowindex,3]
+        #no special chars
+        species_key <<- gsub('[^[:alnum:] ]','',selected_species)
+        #no tabs or newline
+        species_key <<- gsub('[\t\n]','',species_key)
+        #no spaces
+        species_key <<- gsub(' ','', species_key)
+        #lowercase
+        species_key <<- tolower(species_key)
+        
+        updateSpeciesInfo()
+        
+        if (is.na(tagDepID )) {
+            mydf <- data.frame( matrix( ncol = 9, nrow = 1) )
+            colnames(mydf) <- c('tagid', 'project', 'contact', 'started','species','lat','lon','ndays', 'nreceivers')
+            tagdetails_df <- mydf
+        } else {
+           #next get and render the tagDeploymentDetails (who tagged, where, when etc)
+           tagdetails_df <- tagDeploymentDetails(tagDepID)  
+        }
+        
         output$tagdetail <- DT::renderDataTable(tagdetails_df,
                                                 selection = "single", 
                                                 options=list(dom = 'Bfrtip',
                                                              searching = F
                                                              ))
-        ## note this is a local variable assignment
-        tagflight_df <- tagDeploymentDetections(tagDepID)
         
-        #add the tag and release point data to the flight path dataset
-        #there has to be a better way but my R convert datetime to date skills arent up to it...
-        releasepoint_df<-tagdetails_df[c("started","species","lat","lon")]
-        my_date<-as_date(releasepoint_df$started)
-        my_site<-"Tagged"
-        my_lat = releasepoint_df$lat
-        my_lon = releasepoint_df$lon
-        tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon)
-        
-        #sort flight detections so most recent appears at bottom of the list
-        tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
+        #if the tag deployment id is null there wont be any flight data, so just make an empty one
+        if (is.na(tagDepID )) {
+             mydf <- data.frame( matrix( ncol = 4, nrow = 1) )
+             colnames(mydf) <- c('date', 'site', 'lat', 'lon')
+             tagflight_df<-mydf
+       } else {
+             #next get all of the detections associated with this tag deployment
+             # note this is a local variable assignment
+             tagflight_df <- tagDeploymentDetections(tagDepID)
        
+             #add the tag deployment release point data to the flight path dataset
+             #there has to be a better way but my R convert datetime to date skills arent up to it...
+             releasepoint_df<-tagdetails_df[c("started","species","lat","lon")]
+             my_date<-as_date(releasepoint_df$started)
+             my_site<-"Tagged"
+             my_lat = releasepoint_df$lat
+             my_lon = releasepoint_df$lon
+             tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon)
+     
+             #sort flight detection so most recent appears at bottom of the list
+             tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
+
+       } #end if
+
+ 
+       # and render it
         output$flightpath <- DT::renderDataTable(tagflight_df,
                                                  selection = "single", 
                                                  options=list(dom = 'Bfrtip',
-                                                 searching = F
-                                                 ))
+                                                              searching = F,
+                                                              "pageLength" = 18
+                                                              ) #end options
+                                                 ) #end render()
      
-        #print("================== tagflight_df from tagDeploymentDetections(tagDepId) ======================")
-        #print(tagflight_df)
-        #print("============================================================================================")
-        
         #saveRDS(subset_df, file="subset.RDS")
+        
+        if (is.na(tagDepID )) {   
+            myLeafletMap = leaflet() %>% addTiles() #render the empty map
+        } else {  #render the real map
+        # next make the moving markers for the flightpath and then later assemble with the leaflet map
         
         # make a geometry dataframe for the moving marker
         # this will be our 'coordinate reference system'
@@ -294,7 +363,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
         
         # convert travel_df to a 'simple features dataframe' using the coordinate reference system
         # with columns: time,geometry
-        # we willl add the markers in constructing the leaflet map
+        # we will add the markers in constructing the leaflet map
         flight_sf <<- st_as_sf(x = tagflight_df,                         
                                coords = c("lon", "lat"),
                                crs = projcrs)
@@ -324,31 +393,59 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang) {
             popup=label_text
           ) %>%
           
-          # add 2nd set of markers that are bigger radius but completely transparent
-          # to implement a larger touch-target for the touchscreen
+          # OPTIONAL: for touchscreens: we add a 2nd set of markers that have bigger radius and 
+          # are completely transparent to implement a larger touchable target.
           addCircleMarkers(
             lng=~lon,
             lat=~lat,
+            
             radius=15,
             stroke=FALSE,
             fillOpacity=0.0,
             popup=label_text
           ) %>%
           
-          #now add the MovingMarker
+          #now add the MovingMarker layer
           addMovingMarker(data = flight_sf,
                           movingOptions = movingMarkerOptions(autostart = TRUE, loop = FALSE),
                           layerId="movingmarker",
-                          duration=10000,
+                          duration=8000,
                           icon = birdIcon,
                           label="",
                           popup="")
         
+        } # end else tagDepID is not null
+        
+
         # render the output object named leaflet_map
         output$leaflet_map = renderLeaflet(myLeafletMap) 
-        
+ 
     })  # end observeEvent for mytable_rows_selected
+    
+#-------------------------------------------------------------------------------------------------------------
+#   
+#-------------------------------------------------------------------------------------------------------------    
+    # receivers picker input reactive observer
+    # note the main page server.R also has an event observer for this input
+    # note rcvr() is handle to the receivers input picklist passed in from server.R
+    observeEvent(rcvr(), {
+      # NOTE the use of global assignments
+      strReceiverShortName <<- rcvr()  #global assignment
 
+      # on new receiver selection via the picker
+      # update the global string strReceiverShortName
+      # and use it to filter the global dataframe of shortnames and ID's to update
+      # the global variable receiverDeploymentID. Then call myTagsToTable()
+      #to populate the sidebar with a new list of detections
+      
+      selectedreceiver <- filter(gblReceivers_df, Name == strReceiverShortName)      
+      receiverDeploymentID <<- selectedreceiver["ID"]
+      
+      myTagsToTable()
+ 
+    })  #end observeEvent input$receiver_pick
+  
+    
   }) #end moduleServer
 
 }  # end SERVER_ReceiverDetections()

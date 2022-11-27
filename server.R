@@ -40,28 +40,36 @@ server <- function(input, output, session) {
   # Language picker
   observeEvent(input$lang_pick, {
     update_lang(session, input$lang_pick)
-    #TODO: next line is apparently not required
-    #i18n$set_translation_language(input$lang_pick)
     
     # Refresh readme file on the main home page tab of the navbar
     removeUI(selector ="#readmediv", immediate = TRUE)
     insertUI(immediate = TRUE,
              selector = '#readmehere', session=session,
              ui = div(id="readmediv",
-                      includeHTML(
-                        as.character(i18n$get_translations()["ui_mainpage_readmefile",input$lang_pick])
-                                  )
-                      )
-    )
+                includeHTML( as.character(i18n$get_translations()["ui_mainpage_readmefile",input$lang_pick]) )
+             )
+    ) #end insertUI
     
-  })
+  })  #end observeEvent
   
   
+  # the receiver picker input reactive observer need to update
+  # the main page title when a new receiver is picked
+  # note the SERVER_ReceiverDetections() also has an event observer for
+  # this input, see ReceiverDetections.R
+  observeEvent(input$receiver_pick, {
+    output$main_page_title<-renderText({
+      dynamic_title <- input$receiver_pick
+      paste(strMainTitle, dynamic_title)})
+    
+  })  #end observeEvent input$receiver_pick
   
+
   # Pass language selection into the module for Server-side translations
   # If not done, some UI elements will not be updated upon language change
- 
- SERVER_ReceiverDetections("ReceiverDetections"  ,i18n_r = reactive(i18n), lang = reactive(input$lang_pick))
+  # Also pass the receiver picker as it will need to be observed by a reactive
+  # event in SERVER_ReceiverDetection also
+ SERVER_ReceiverDetections("ReceiverDetections"  ,i18n_r = reactive(i18n), lang = reactive(input$lang_pick), rcvr= reactive(input$receiver_pick))
 
  }
 

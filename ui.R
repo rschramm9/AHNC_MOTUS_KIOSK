@@ -89,10 +89,9 @@ ui_navbar <-  div( class="navbar1", navbarPage("", theme="custom-navbar.css", #p
                  ),
        
                  tabPanel(i18n$t("ui_RCVR_title")
-                          , UI_ReceiverDetections("ReceiverDetections", i18n=i18n)
+                          , UI_ReceiverDetections("ReceiverDetections", i18n=i18n),
                  ),
-                
-                 
+
       ),
 ) #end the ui_navbar definition
 
@@ -104,19 +103,49 @@ ui_titlebar <- fluidRow(
   
   titlePanel(   
     tagList(
-
+      # NOTE: Offseting logo -30PX to recover vertical space.. value determined by trial and error
       #img(src = "images/logos/ankenyhill_logo.png", height = 80),
-      img(src = strMainLogoFile, height = numMainLogoHeight),
+      div(style="display: inline-block;margin-top:-30px;",img(src = strMainLogoFile, height = numMainLogoHeight)),
       
       #span("MOTUS KIOSK", style="color:#8FBC8F;font-style: italic;font-size: 25px;",
-      span(strMainTitle, style="color:#8FBC8F;font-style: italic;font-size: 25px;",
+      #span(strMainTitle, style="color:#8FBC8F;font-style: italic;font-size: 25px;",
+      
+      span(style="color:#8FBC8F;font-style: italic;font-size: 25px;",     
+       
+     
+  
+           div(style="display: inline-block;vertical-align:middle; width: 50%;",textOutput("main_page_title")),
+           #div(style="display: inline-block;vertical-align:top; width: 170px;", pickerInput(inputId = "receiver_pick",
+
+           
+           
+           
+           div(style="display: inline-block;vertical-align:top;width:120px", pickerInput(inputId = "receiver_pick",
+                                              #label = "",
+                                              label = i18n$t("ui_mainpage_available_receivers"),
+                                              width = 170,
+                                              #choices = gblReceivers_df["Name"],
+                                              choices = lstReceiverShortNames,
+                                              options = pickerOptions(container = "body")
+                                              )) ,
+               
+      #textOutput("text1"),
+     
+      
            span(
              tags$div(  tags$style(".jhr{
                        display: inline;
                        vertical-align: middle;
                        padding-left: 10px;
                         }")),
-            
+  #           pickerInput(inputId = "receiver_pick",
+  #                       label = "",
+  #                       width = 170,
+  #                       choices = gblReceivers_df["Name"],
+  #                       options = pickerOptions(container = "body")
+  #           ), 
+  
+  
               pickerInput(inputId = "lang_pick",
                          label = "",
                          width = 170,
@@ -124,10 +153,22 @@ ui_titlebar <- fluidRow(
                          choicesOpt = list( content=df$img),
                          options = pickerOptions(container = "body")
              ),
-            
-            
+             
+          
+             
+            # pickerInput(inputId = "receiver_pick",
+            #             label = "Receivers",
+            #             width = 170,
+            #             #choices = lstReceiverShortNames,
+            #             choices = gblReceivers_df["Name"],
+            #             #choicesOpt = list( content=df$img),
+            #             options = pickerOptions(container = "body"),
+           #  ),            
+
+             
              style = "position:absolute;right:2em;"
-           ) #end span2
+           ), #end span2
+        #style = "inline-block"
       ), #end span1
       
     ) # end taglist

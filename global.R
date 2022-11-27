@@ -118,9 +118,9 @@ tryCatch(
 #str(configfrm)
 
 configtbl <- data.table(configfrm, key='Key')
-print("---------  The configtbl ------------")
-print(configtbl)
-print("-------------------------------------")
+#print("---------  The configtbl ------------")
+#print(configtbl)
+#print("-------------------------------------")
 
 badCfg <- 0  #assume good config
 
@@ -159,16 +159,27 @@ badCfg <- 0  #assume good config
     
 
     #print("------------ ReceiverDeploymentID --------------")
-    #for now assume its length=1, but later we may want to support many
-    list1 <- keyValueToList(configtbl,'ReceiverDeploymentID')
+    #the default target receiver is the first list item
+    lstReceiverDeployments <- keyValueToList(configtbl,'ReceiverDeploymentID')
     if( is.null(list1) ){
       badCfg <- 1 
       receiverDeploymentID <- NULL
     } else {
-      receiverDeploymentID <- as.numeric(list1[1]) #assume length=1
+      receiverDeploymentID <- as.numeric(lstReceiverDeployments[1]) #assume length=1
     }
-    #print(paste0("ReceiverDeploymentID:",receiverDeploymentID))
+    #print(paste0("global.R @170: ReceiverDeploymentID:",receiverDeploymentID))
     
+    #print("------------ ReceiverShortName ----------------")
+    #we can get a list, and the initial choice will be the first list element
+    lstReceiverShortNames <- keyValueToList(configtbl,'ReceiverShortName')
+    if( is.null(lstReceiverShortNames) ){
+      badCfg <- 1
+      strReceiverShortName<-NULL
+    } else {
+      #I ultimately want a string
+      strReceiverShortName<- toString(lstReceiverShortNames[1])  
+    }
+    #print(paste0("ReceiverShortName:",strReceiverShortName))
     
      #print("------------ MovingMarkerIcon ----------------")
      list1 <- keyValueToList(configtbl,'MovingMarkerIcon')
@@ -181,7 +192,6 @@ badCfg <- 0  #assume good config
      }
      #print(paste0("MovingMarkerIcon:",strMovingMarkerIcon))
      
-  
      #print("------------ MovingMarkerIconWidth --------------")
      list1 <- keyValueToList(configtbl,'MovingMarkerIconWidth')
      if( is.null(list1) ){
@@ -203,19 +213,6 @@ badCfg <- 0  #assume good config
      }
      #print(paste0("MovingMarkerIconHeight:",numMovingMarkerIconHeight))
      
-
-     #print("------------ ReceiverShortName ----------------")
-     #for now assume its length=1, but later we may want to support many
-     list1 <- keyValueToList(configtbl,'ReceiverShortName')
-     if( is.null(list1) ){
-       badCfg <- 1
-       strReceiverShortName<-NULL
-     } else {
-         #I ultimately want a string
-         strReceiverShortName<- toString(list1[1])  
-     }
-     #print(paste0("ReceiverShortName:",strReceiverShortName))
-     
      #print("-----------------Done processing config----------------------------------")
      
      
@@ -224,13 +221,26 @@ badCfg <- 0  #assume good config
        stop("There is an error in your kiosk cfg file")
      }
      
+     # these two lists support the receiver Picklist
+     if( length(lstReceiverShortNames) != length(lstReceiverDeployments) ){
+        stop("There is a problem with your kiosk.cfg file. THe ReceiverShortName list must be same length as ReceiverIDs list")
+     }
      
-# Initially populate the dataframes here
-# we want these to be global variables... (note the <<- ) 
-     
-#print("======== in global.R  try to load detectionf_df ========")
-detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
-#print (detections_df)
-#print("============================================")
+     # the shortnames list contains the visible choices on the dropdown
+     # here we make a dataframe from the shortnames and the deployment ids, later we
+     # use the reactive picklist choice to filter the dataframe to get the desired deployment id
+     gblReceivers_df <<- data.frame(unlist(lstReceiverShortNames),unlist(lstReceiverDeployments))
+     #to name the columns we use names() function
+     names(gblReceivers_df) = c("Name","ID")
+    selectedreceiver <<- filter(gblReceivers_df, Name == strReceiverShortName)
 
-detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
+    # NOTE the use of global assignments
+    receiverDeploymentID <<- selectedreceiver["ID"]
+   
+    # Initially populate the dataframes here
+    # we want these to be global variables... (note the <<- ) 
+
+    detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
+    #print (detections_df)
+
+    detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
