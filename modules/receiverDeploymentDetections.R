@@ -144,7 +144,7 @@ receiverDeploymentDetections <- function(rcvrDepID)
   
   warn = getOption("warn")
   options(warn=-1)
-  ans <- str_detect( pnodes, "No receiver deployment" )
+  ans <- str_detect( toString(pnodes), "No receiver deployment" )
   options(warn=warn)
   
   newans <- any(ans, na.rm = TRUE)  #collapse vector to one element
@@ -200,7 +200,7 @@ receiverDeploymentDetections <- function(rcvrDepID)
   # string 'Detection date'
   # We need the true number of detection records to process in the
   # for loop that follows
-  hasFooter <- str_detect( tbl1[[1]][num.rows], "Detection date" )
+  hasFooter <- str_detect(toString( tbl1[[1]][num.rows]), "Detection date" )
   if(hasFooter == 1){
     nrecords <- num.rows -1
   } else {
@@ -246,7 +246,7 @@ receiverDeploymentDetections <- function(rcvrDepID)
   for (node in a_nodes) {
     #print(node)
     #print(class(node))
-    ans <- str_detect( node, "tagDeployment" )
+    ans <- str_detect( toString(node), "tagDeployment" )
     if(ans) {
       n <- n+1
       theID <- as.numeric( sub("\\D*(\\d+).*", "\\1", node) )

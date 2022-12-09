@@ -137,7 +137,7 @@ pnodes <- html_nodes(page, "p")
 
 warn = getOption("warn")
 options(warn=-1)
-ans <- str_detect( pnodes, "No receiver deployment" )
+ans <- str_detect( toString(pnodes), "No receiver deployment" )
 options(warn=warn)
 
 #print( ans )

@@ -146,7 +146,7 @@ tagDeploymentDetails <- function(tagDeploymentID)
   #  argument is not an atomic vector; coercing
   warn = getOption("warn")
   options(warn=-1)
-  ans <- str_detect( pnodes, "Show detections in:" )
+  ans <- str_detect( toString(pnodes), "Show detections in:" )
   options(warn=warn)
   
   newans <- any(ans, na.rm = TRUE)  #colapse vector to one element
@@ -169,7 +169,7 @@ tagDeploymentDetails <- function(tagDeploymentID)
   
   warn = getOption("warn")
   options(warn=-1)
-  ans <- str_detect( pnodes, "No tag deployment" )
+  ans <- str_detect(toString( pnodes), "No tag deployment" )
   options(warn=warn)
   
   #print( ans )
@@ -211,7 +211,7 @@ tagDeploymentDetails <- function(tagDeploymentID)
   
   #location is string like: "Lat.: 49.1225°, Lon.: -125.8867° (map)"
   #so we extract to variables lat and lon
-  if( str_detect(location, "unknown") ) {
+  if( str_detect(toString(location), "unknown") ) {
     lat <- "unknown"
     lon <- "unknown"
     message("location is unknown")
