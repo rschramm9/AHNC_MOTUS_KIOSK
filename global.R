@@ -213,6 +213,15 @@ badCfg <- 0  #assume good config
      }
      #print(paste0("MovingMarkerIconHeight:",numMovingMarkerIconHeight))
      
+     #print("------------ InactivityTimeoutSeconds --------------")
+     list1 <- keyValueToList(configtbl,'InactivityTimeoutSeconds')
+     if( is.null(list1) ){
+       numInactivityTimeoutSeconds<-1800 #30 minutes
+     } else {
+       numInactivityTimeoutSeconds<- as.numeric(list1[1]) #assume length=1
+     }
+     #print(paste0("MovingMarkerIconHeight:",numMovingMarkerIconHeight))
+     
      #print("-----------------Done processing config----------------------------------")
      
      
@@ -244,3 +253,31 @@ badCfg <- 0  #assume good config
     #print (detections_df)
 
     detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
+
+    
+    ## javascript idleTimer to reset gui when its been inactive 
+    ## see also server.R  observeEvent(input$timeOut)
+    #numInactivityTimeoutSecond <- 30 #seconds
+    inactivity <- sprintf("function idleTimer() {
+    var t = setTimeout(resetMe, %s);
+     window.onmousemove = resetTimer; // catches mouse movements
+     window.onmousedown = resetTimer; // catches mouse movements
+     window.onclick = resetTimer;     // catches mouse clicks
+     window.onscroll = resetTimer;    // catches scrolling
+     window.onkeypress = resetTimer;  //catches keyboard actions
+
+     function resetMe() {
+       Shiny.setInputValue('timeOut', '%ss')
+     }
+
+     function resetTimer() {
+       clearTimeout(t);
+       t = setTimeout(resetMe, %s);  // time is in milliseconds (1000 is 1 second)
+     }
+   }
+
+   idleTimer();", numInactivityTimeoutSeconds*1000, numInactivityTimeoutSeconds, numInactivityTimeoutSeconds*1000)
+
+
+    
+    

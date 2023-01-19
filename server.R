@@ -35,6 +35,13 @@ server <- function(input, output, session) {
   i18n <- Translator$new(translation_csvs_path = paste0("data/translations"),
                          separator_csv="|")
   i18n$set_translation_language(default_UI_lang)
+ 
+  
+  # On inactivity timeout, reset the dashboard UI to startup defaults
+  observeEvent(input$timeOut, { 
+    print(paste0("Session (", session$token, ") timed out at: ", Sys.time()))
+    session$reload()
+  })
   
 
   # Language picker

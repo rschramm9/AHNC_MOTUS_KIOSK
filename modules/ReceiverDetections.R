@@ -334,7 +334,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
              my_lat = releasepoint_df$lat
              my_lon = releasepoint_df$lon
              tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon)
-     
+
              #sort flight detection so most recent appears at bottom of the list
              tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
 

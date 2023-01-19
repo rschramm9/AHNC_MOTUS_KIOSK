@@ -82,13 +82,14 @@ ui_mainpage <- fluidPage(
 ## defined in modules
 ## *** note how the language translation is passed into the function**
 ###############################################################################
-ui_navbar <-  div( class="navbar1", navbarPage("", theme="custom-navbar.css", #position = "fixed-top",
+#10Dec2022 - give the navbar and the tabpanels id's so we can specify them in the server on page reset
+ui_navbar <-  div( class="navbar1", navbarPage("",id="inTabset",theme="custom-navbar.css", #position = "fixed-top",
                   
-                 tabPanel(i18n$t("ui_nav_page_main"),
+                 tabPanel(value="panel1", i18n$t("ui_nav_page_main"),
                           ui_mainpage
                  ),
        
-                 tabPanel(i18n$t("ui_RCVR_title")
+                 tabPanel(value="panel2", i18n$t("ui_RCVR_title")
                           , UI_ReceiverDetections("ReceiverDetections", i18n=i18n),
                  ),
 
@@ -110,9 +111,8 @@ ui_titlebar <- fluidRow(
       #span("MOTUS KIOSK", style="color:#8FBC8F;font-style: italic;font-size: 25px;",
       #span(strMainTitle, style="color:#8FBC8F;font-style: italic;font-size: 25px;",
       
-      span(style="color:#8FBC8F;font-style: italic;font-size: 25px;",     
-       
-     
+      span(style="color:#8FBC8F;font-style: italic;font-size: 25px;", 
+           
   
            div(style="display: inline-block;vertical-align:middle; width: 50%;",textOutput("main_page_title")),
            #div(style="display: inline-block;vertical-align:top; width: 170px;", pickerInput(inputId = "receiver_pick",
@@ -138,13 +138,6 @@ ui_titlebar <- fluidRow(
                        vertical-align: middle;
                        padding-left: 10px;
                         }")),
-  #           pickerInput(inputId = "receiver_pick",
-  #                       label = "",
-  #                       width = 170,
-  #                       choices = gblReceivers_df["Name"],
-  #                       options = pickerOptions(container = "body")
-  #           ), 
-  
   
               pickerInput(inputId = "lang_pick",
                          label = "",
@@ -154,17 +147,7 @@ ui_titlebar <- fluidRow(
                          options = pickerOptions(container = "body")
              ),
              
-          
-             
-            # pickerInput(inputId = "receiver_pick",
-            #             label = "Receivers",
-            #             width = 170,
-            #             #choices = lstReceiverShortNames,
-            #             choices = gblReceivers_df["Name"],
-            #             #choicesOpt = list( content=df$img),
-            #             options = pickerOptions(container = "body"),
-           #  ),            
-
+    
              
              style = "position:absolute;right:2em;"
            ), #end span2
@@ -185,7 +168,7 @@ ui_titlebar <- fluidRow(
 ## assemble the UI from the pieces
 ###############################################################################
 ui <- fluidPage(
-  
+  tags$script(inactivity),    
   ui_titlebar,
   ui_navbar
   
