@@ -255,6 +255,30 @@ badCfg <- 0  #assume good config
     detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
 
     
+    tryCatch ( 
+    {  
+         f <- paste0(getwd(),"/exclude_detections",".csv")
+         if (file.exists(f)){
+            exclude_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
+            exclude_df[[1]] <- as.Date(exclude_df[[1]])
+         } else { exclude_df= NULL }
+    
+    },
+    warning = function( w )
+    {
+         print() # dummy warning function to suppress the output of warnings
+         exclude_df= NULL
+    },
+       error = function( err )
+    {
+       print("exclude_detections.csv read error")
+       print("here is the err returned by the read:")
+       print(err)
+       exclude_df= NULL
+    } )
+    
+      #data[,1] <- strptime(data[,1], "%Y-%m-%d")
+    
     ## javascript idleTimer to reset gui when its been inactive 
     ## see also server.R  observeEvent(input$timeOut)
     #numInactivityTimeoutSecond <- 30 #seconds

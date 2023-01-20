@@ -318,14 +318,15 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
         
         #if the tag deployment id is null there wont be any flight data, so just make an empty one
         if (is.na(tagDepID )) {
-             mydf <- data.frame( matrix( ncol = 4, nrow = 1) )
-             colnames(mydf) <- c('date', 'site', 'lat', 'lon')
+             mydf <- data.frame( matrix( ncol = 5, nrow = 1) )
+             colnames(mydf) <- c('date', 'site', 'lat', 'lon', 'receiverDeplymentID')
              tagflight_df<-mydf
        } else {
              #next get all of the detections associated with this tag deployment
              # note this is a local variable assignment
+           
              tagflight_df <- tagDeploymentDetections(tagDepID)
-       
+             
              #add the tag deployment release point data to the flight path dataset
              #there has to be a better way but my R convert datetime to date skills arent up to it...
              releasepoint_df<-tagdetails_df[c("started","species","lat","lon")]
@@ -333,8 +334,12 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
              my_site<-"Tagged"
              my_lat = releasepoint_df$lat
              my_lon = releasepoint_df$lon
-             tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon)
+             my_receiverDeployment=0
+             tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon,my_receiverDeployment)
 
+             
+             
+             
              #sort flight detection so most recent appears at bottom of the list
              tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
 

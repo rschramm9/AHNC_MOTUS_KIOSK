@@ -72,7 +72,8 @@ ui_mainpage <- fluidPage(
   tags$div(id = 'readmehere',
            div(id="readmediv",
                tags$h4(i18n$t("ui_mainpage_loading")))
-  )
+  ),
+
 )  # end of main page layout
 
 
