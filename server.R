@@ -46,7 +46,10 @@ server <- function(input, output, session) {
 
   # Language picker
   observeEvent(input$lang_pick, {
-    update_lang(session, input$lang_pick)
+    # 07Feb2023 workaround bug found in shiny.i18n package update_lang() function
+    # order of arguments reversed issue.. specify arguments by name instead of
+    # by position.
+    update_lang(session=session, language=input$lang_pick)
     
     # Refresh readme file on the main home page tab of the navbar
     removeUI(selector ="#readmediv", immediate = TRUE)
