@@ -21,10 +21,12 @@
 # and was learned via exploring his ClinRTools modularized demo found at:
 # https://bitbucket.org/statsconsult/clinrtoolsdemo/src/master/
 
-# This app uses the i18n package to perform language translations
-# i18n package is Copyright Copyright (c) 2016 Appsilon Sp. z o.o.
+# This app uses the shiny.i18n package to perform language translations
+# shiny.i18n package is Copyright Copyright (c) 2023 Appsilon Sp. z o.o.
 # and distributed under MIT license. see:https://github.com/Appsilon/shiny.i18n
-
+# Citation: Nowicki J, Krzemiński D, Igras K, Sobolewski J (2023).
+# shiny.i18n: Shiny Applications Internationalization.
+# https://appsilon.github.io/shiny.i18n/, https://github.com/Appsilon/shiny.i18n.
 
 # Globals: libraries, modules etc.
 
