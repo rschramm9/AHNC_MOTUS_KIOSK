@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright 2022 Richard Schramm
+# Copyright 2022-2023 Richard Schramm
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +29,10 @@
 # https://appsilon.github.io/shiny.i18n/, https://github.com/Appsilon/shiny.i18n.
 
 # Globals: libraries, modules etc.
+
+############### Put github release version and data here ##########
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 3.0.6  12-Feb-2023"
+############### will be rendered into footer by server() ########## 
 
 
 library(shiny)
