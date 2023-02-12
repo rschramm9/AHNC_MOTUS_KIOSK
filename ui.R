@@ -1,6 +1,6 @@
 
 ###############################################################################
-# Copyright 2022 Richard Schramm
+# Copyright 2022-2023 Richard Schramm
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,8 +71,11 @@ ui_mainpage <- fluidPage(
   
   tags$div(id = 'readmehere',
            div(id="readmediv",
-               tags$h4(i18n$t("ui_mainpage_loading")))
-  ),
+               tags$h4(i18n$t("ui_mainpage_loading"))
+           )
+  )
+  
+  
 
 )  # end of main page layout
 
@@ -106,21 +109,12 @@ ui_titlebar <- fluidRow(
   titlePanel(   
     tagList(
       # NOTE: Offseting logo -30PX to recover vertical space.. value determined by trial and error
-      #img(src = "images/logos/ankenyhill_logo.png", height = 80),
       div(style="display: inline-block;margin-top:-30px;",img(src = strMainLogoFile, height = numMainLogoHeight)),
       
-      #span("MOTUS KIOSK", style="color:#8FBC8F;font-style: italic;font-size: 25px;",
-      #span(strMainTitle, style="color:#8FBC8F;font-style: italic;font-size: 25px;",
-      
       span(style="color:#8FBC8F;font-style: italic;font-size: 25px;", 
-           
   
-           div(style="display: inline-block;vertical-align:middle; width: 50%;",textOutput("main_page_title")),
-           #div(style="display: inline-block;vertical-align:top; width: 170px;", pickerInput(inputId = "receiver_pick",
-
-           
-           
-           
+           div(style="display: inline-block;vertical-align:middle; width: 50%;", textOutput("main_page_title")),
+          
            div(style="display: inline-block;vertical-align:top;width:120px", pickerInput(inputId = "receiver_pick",
                                               #label = "",
                                               label = i18n$t("ui_mainpage_available_receivers"),
@@ -129,10 +123,7 @@ ui_titlebar <- fluidRow(
                                               choices = lstReceiverShortNames,
                                               options = pickerOptions(container = "body")
                                               )) ,
-               
-      #textOutput("text1"),
-     
-      
+            
            span(
              tags$div(  tags$style(".jhr{
                        display: inline;
@@ -148,20 +139,15 @@ ui_titlebar <- fluidRow(
                          options = pickerOptions(container = "body")
              ),
              
-    
-             
+
              style = "position:absolute;right:2em;"
            ), #end span2
-        #style = "inline-block"
+           
       ), #end span1
       
     ) # end taglist
     
   ), #end titlepanel
-  
-  
- ## looks a bit nicer with a separator but it takes up space so comment out 
- # hr(),
   
 )  #end the ui_title fluidRow
 
@@ -171,7 +157,22 @@ ui_titlebar <- fluidRow(
 ui <- fluidPage(
   tags$script(inactivity),    
   ui_titlebar,
-  ui_navbar
+  ui_navbar,
+  
+  # horizontal line and a small plain text footer 
+  hr(style="display: block;
+            paddding: 1px;
+            margin-top: 0.25em;
+            margin-bottom: 0.25em;"
+            ),
+  
+  textOutput("footer")%>% 
+    tagAppendAttributes(style= 'font-size: 10px;
+                        padding: 1px;
+                        margin-bottom: 1px;
+                        margin-top: 1px;
+                        margin-left: 10px;
+                        ') 
   
 )   # end of ui definition
 
