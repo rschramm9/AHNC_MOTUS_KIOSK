@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright 2022 Richard Schramm
+# Copyright 2022-2023 Richard Schramm
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,6 +36,13 @@ server <- function(input, output, session) {
                          separator_csv="|")
   i18n$set_translation_language(default_UI_lang)
  
+  
+  # render the versioning text string set in global.R to the
+  # main page footer output
+  output$footer<-renderText({gblFooterText})
+  
+  
+  
   
   # On inactivity timeout, reset the dashboard UI to startup defaults
   observeEvent(input$timeOut, { 
