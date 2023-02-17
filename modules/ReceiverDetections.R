@@ -261,7 +261,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
     # Update text values when language is changed
     #note lang() is handle to the language input picklist passed in from server.R
     observeEvent(lang(), {
-      i18n_r()$set_translation_language(lang())
+      ############# i18n_r()$set_translation_language(lang())
       updateSpeciesInfo()
     }) #end observeEvent(lang()
     
@@ -443,8 +443,8 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
       # the global variable receiverDeploymentID. Then call myTagsToTable()
       #to populate the sidebar with a new list of detections
       
-      selectedreceiver <- filter(gblReceivers_df, Name == strReceiverShortName)      
-      receiverDeploymentID <<- selectedreceiver["ID"]
+      selectedreceiver <- filter(gblReceivers_df, shortName == strReceiverShortName)      
+      receiverDeploymentID <<- selectedreceiver["receiverDeploymentID"]
       
       myTagsToTable()
  

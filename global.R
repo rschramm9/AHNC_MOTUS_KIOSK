@@ -31,7 +31,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 3.0.6  12-Feb-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 3.1.0  16-Feb-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -74,7 +74,7 @@ source("modules/ReceiverDetections.R")
 source("modules/tagDeploymentDetails.R")          #tagDeploymentDetails
 source("modules/tagDeploymentDetections.R")       #the flightpath
 source("modules/receiverDeploymentDetections.R")  #whats been at our receiver
-
+source("modules/MotusNews.R")  #whats been at our receiver
 
 tryCatch( 
   {  
@@ -230,7 +230,6 @@ badCfg <- 0  #assume good config
      
      #print("-----------------Done processing config----------------------------------")
      
-     
      #halt if config processing didn't finish cleanly
      if( badCfg == 1){
        stop("There is an error in your kiosk cfg file")
@@ -246,50 +245,50 @@ badCfg <- 0  #assume good config
      # use the reactive picklist choice to filter the dataframe to get the desired deployment id
      gblReceivers_df <<- data.frame(unlist(lstReceiverShortNames),unlist(lstReceiverDeployments))
      #to name the columns we use names() function
-     names(gblReceivers_df) = c("Name","ID")
-    selectedreceiver <<- filter(gblReceivers_df, Name == strReceiverShortName)
-
-    # NOTE the use of global assignments
-    receiverDeploymentID <<- selectedreceiver["ID"]
+     names(gblReceivers_df) = c("shortName","receiverDeploymentID")
+     selectedreceiver <<- filter(gblReceivers_df, shortName == strReceiverShortName)
+    
+     # NOTE the use of global assignments
+     receiverDeploymentID <<- selectedreceiver["receiverDeploymentID"]
    
-    # Initially populate the dataframes here
-    # we want these to be global variables... (note the <<- ) 
+     # Initially populate the dataframes here
+     # we want these to be global variables... (note the <<- ) 
 
-    detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
-    #print (detections_df)
+     detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
+     #print (detections_df)
 
-    detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
+     detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
 
     
-    tryCatch ( 
-    {  
+     tryCatch ( 
+     {  
          f <- paste0(getwd(),"/exclude_detections",".csv")
          if (file.exists(f)){
             exclude_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
             exclude_df[[1]] <- as.Date(exclude_df[[1]])
          } else { exclude_df= NULL }
     
-    },
-    warning = function( w )
-    {
+     },
+     warning = function( w )
+     {
          print() # dummy warning function to suppress the output of warnings
          exclude_df= NULL
-    },
-       error = function( err )
-    {
+     },
+     error = function( err )
+     {
        print("exclude_detections.csv read error")
        print("here is the err returned by the read:")
        print(err)
        exclude_df= NULL
-    } )
+     } )
     
       #data[,1] <- strptime(data[,1], "%Y-%m-%d")
     
-    ## javascript idleTimer to reset gui when its been inactive 
-    ## see also server.R  observeEvent(input$timeOut)
-    #numInactivityTimeoutSecond <- 30 #seconds
-    inactivity <- sprintf("function idleTimer() {
-    var t = setTimeout(resetMe, %s);
+     ## javascript idleTimer to reset gui when its been inactive 
+     ## see also server.R  observeEvent(input$timeOut)
+     #numInactivityTimeoutSecond <- 30 #seconds
+     inactivity <- sprintf("function idleTimer() {
+     var t = setTimeout(resetMe, %s);
      window.onmousemove = resetTimer; // catches mouse movements
      window.onmousedown = resetTimer; // catches mouse movements
      window.onclick = resetTimer;     // catches mouse clicks

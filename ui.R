@@ -39,6 +39,7 @@ active_ui_lang <- grep("ui",i18n$get_languages(), invert = TRUE, value = TRUE)
 # then set the default
 i18n$set_translation_language(default_UI_lang)  #set in global.R
 
+
 # this language data frame  gets used in the language selector defined below in
 # ui_titlebar() section
 #  *** these must match EXACTLY the translations
@@ -96,6 +97,11 @@ ui_navbar <-  div( class="navbar1", navbarPage("",id="inTabset",theme="custom-na
                  tabPanel(value="panel2", i18n$t("ui_RCVR_title")
                           , UI_ReceiverDetections("ReceiverDetections", i18n=i18n),
                  ),
+                 
+                 tabPanel(value="panel3", i18n$t("ui_MotusNews_title")
+                          , UI_MotusNews("MotusNews", i18n=i18n),
+                 ),
+                 
 
       ),
 ) #end the ui_navbar definition
@@ -161,7 +167,7 @@ ui <- fluidPage(
   
   # horizontal line and a small plain text footer 
   hr(style="display: block;
-            paddding: 1px;
+            padding: 1px;
             margin-top: 0.25em;
             margin-bottom: 0.25em;"
             ),

@@ -35,7 +35,7 @@ server <- function(input, output, session) {
   i18n <- Translator$new(translation_csvs_path = paste0("data/translations"),
                          separator_csv="|")
   i18n$set_translation_language(default_UI_lang)
- 
+
   
   # render the versioning text string set in global.R to the
   # main page footer output
@@ -87,6 +87,6 @@ server <- function(input, output, session) {
   # Also pass the receiver picker as it will need to be observed by a reactive
   # event in SERVER_ReceiverDetection also
  SERVER_ReceiverDetections("ReceiverDetections"  ,i18n_r = reactive(i18n), lang = reactive(input$lang_pick), rcvr= reactive(input$receiver_pick))
-
+ SERVER_MotusNews("MotusNews",i18n_r = reactive(i18n), lang = reactive(input$lang_pick), rcvr= reactive(input$receiver_pick))
  }
 

@@ -14,6 +14,9 @@ ui_mainpage_available_receivers|Receptores Disponibles
 ui_mainpage_loading|Loading...
 ui_mainpage_readmefile|www/docs/homepage_readme_es.html
 
+ui_MotusNews_title|Noticias Motus!
+ui_motusnews_loading|Noticias cargando
+ui_motusnews_unknown|www/news/stories/news_unknown_es.html
 
 ui_RCVR_title|Detecciones del receptor
 
@@ -24,7 +27,7 @@ ui_RCVR_detections_flightpath_tab_label|Historial de vuelos
 ui_RCVR_detections_flightpath_tab_helptext|Los detalles del historial de vuelo del ave seleccionada
 
 ui_RCVR_detections_leaflet_tab_label|Mapa de vuelo
-ui_RCVR_detections_leaflet_tab_helptext|Use los controles a continuación para simular la ruta aproximada que voló el ave.
+ui_RCVR_detections_leaflet_tab_helptext|Use los botones a continuación para simular la ruta aproximada que voló el ave. Tenga en cuenta que los datos pueden contener detecciones falsas de "punto salvaje" que no intentamos filtrar.
 
 ui_RCVR_detections_species_tab_label|Especies
 ui_RCVR_detections_species_tab_helptext|Información sobre la especie del ave seleccionada.
