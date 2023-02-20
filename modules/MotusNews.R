@@ -70,10 +70,6 @@ SERVER_MotusNews <- function(id, i18n_r, lang, rcvr) {
     #-------------------------------------------------------------------------------------------------------------  
     myRenderFunction <- function(x) {
       
-      # dont need to know this at the mopment...
-      # selected = i18n_r()$get_translation_language()  #e.g. 'en' or 'es'"
-      
-
       # file like "/Users/rich/Projects/AHNC_MOTUS_KIOSK/www/news/stories/news_unknown_en.html") 
       # get the default 'news_unknown' html filename matching the current language
       # (see data/translations csv file)    
@@ -111,10 +107,7 @@ SERVER_MotusNews <- function(id, i18n_r, lang, rcvr) {
     # Update text values when language is changed
     # note lang() is handle to the language input picklist passed in from server.R
     observeEvent(lang(), {
-      # we rely on server.R to set this?
-      #i18n_r()$set_translation_language(lang())
- 
-      
+      i18n_r()$set_translation_language(lang())
       myRenderFunction()
     }) #end observeEvent(lang()
 
