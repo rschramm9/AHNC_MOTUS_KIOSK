@@ -31,7 +31,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 3.1.0  16-Feb-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 3.1.1  20-Feb-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -253,7 +253,7 @@ badCfg <- 0  #assume good config
    
      # Initially populate the dataframes here
      # we want these to be global variables... (note the <<- ) 
-
+     
      detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
      #print (detections_df)
 
