@@ -1,5 +1,5 @@
 
-###############################################################################
+#############deployApp()##################################################################
 # Copyright 2022-2023 Richard Schramm
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -75,7 +75,7 @@ ui_mainpage <- fluidPage(
                tags$h4(i18n$t("ui_mainpage_loading"))
            )
   )
-  
+
   
 
 )  # end of main page layout
@@ -88,18 +88,24 @@ ui_mainpage <- fluidPage(
 ## *** note how the language translation is passed into the function**
 ###############################################################################
 #10Dec2022 - give the navbar and the tabpanels id's so we can specify them in the server on page reset
-ui_navbar <-  div( class="navbar1", navbarPage("",id="inTabset",theme="custom-navbar.css", #position = "fixed-top",
-                  
-                 tabPanel(value="panel1", i18n$t("ui_nav_page_main"),
+
+
+ui_navbar <-  div( class="navbar1",  style="font-family: Verdana font-style: normal;font-size: 20px;",
+ #navbarPage("",id="inTabset",theme="custom-navbar.css", 
+
+ navbarPage("",id="inTabset",theme="my-custom-theme.css", 
+            
+            tabPanel(value="panel1", i18n$t("ui_nav_page_main"),style="color:#000000;font-style: normal;font-size: 12px;",
+            ###tabPanel(value="panel1", i18n$t("ui_nav_page_main"),
                           ui_mainpage
                  ),
        
-                 tabPanel(value="panel2", i18n$t("ui_RCVR_title")
-                          , UI_ReceiverDetections("ReceiverDetections", i18n=i18n),
+                 tabPanel(value="panel2", i18n$t("ui_RCVR_title"),style="color:#000000;font-style: normal;font-size: 14px;",
+                          UI_ReceiverDetections("ReceiverDetections", i18n=i18n),
                  ),
                  
-                 tabPanel(value="panel3", i18n$t("ui_MotusNews_title")
-                          , UI_MotusNews("MotusNews", i18n=i18n),
+                 tabPanel(value="panel3", i18n$t("ui_MotusNews_title"),style="color:#000000;font-style: normal;font-size: 10px;",
+                          UI_MotusNews("MotusNews", i18n=i18n),
                  ),
                  
 
