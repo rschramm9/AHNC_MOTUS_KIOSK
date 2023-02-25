@@ -31,7 +31,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 3.1.1  20-Feb-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 3.1.2  24-Feb-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -66,7 +66,6 @@ default_UI_lang <- "en"
 
 ###### read configuration key/value pairs
 library(data.table)
-
 
 # Add individual modules here
 source("modules/utility_functions.R")
@@ -255,6 +254,7 @@ badCfg <- 0  #assume good config
      # we want these to be global variables... (note the <<- ) 
      
      detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
+     
      #print (detections_df)
 
      detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
@@ -281,6 +281,30 @@ badCfg <- 0  #assume good config
        print(err)
        exclude_df= NULL
      } )
+     
+     ### work in progress... not filtering these yet.
+     tryCatch ( 
+       {  
+         f <- paste0(getwd(),"/suspect_detections",".csv")
+         if (file.exists(f)){
+           suspect_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
+           suspect_df[[1]] <- as.Date(suspect_df[[1]])
+         } else { suspect_df= NULL }
+         
+       },
+       warning = function( w )
+       {
+         print() # dummy warning function to suppress the output of warnings
+         suspect_df= NULL
+       },
+       error = function( err )
+       {
+         print("suspect_detections.csv read error")
+         print("here is the err returned by the read:")
+         print(err)
+         suspect_df= NULL
+       } )
+     #print(suspect_df)
     
       #data[,1] <- strptime(data[,1], "%Y-%m-%d")
     
