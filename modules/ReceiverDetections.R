@@ -364,7 +364,16 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
         
         # make a geometry dataframe for the moving marker
         # this will be our 'coordinate reference system'
-        projcrs <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+          
+          # this call generated sf layer warnings... below is a 
+          #projcrs <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"  
+          #Warning: sf layer has inconsistent datum (+proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0
+          # +no_defs). Need '+proj=longlat +datum=WGS84'
+          
+          #the method below keeps up with"recent (and ongoing) changes in several
+          #important geospatial libraries"
+          #see https://inbo.github.io/tutorials/tutorials/spatial_crs_coding/
+          projcrs <- st_crs(4326) # WGS 84 has EPSG code 4326
         
         # convert travel_df to a 'simple features dataframe' using the coordinate reference system
         # with columns: time,geometry
