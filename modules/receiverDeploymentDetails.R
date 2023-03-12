@@ -20,16 +20,19 @@
 # 08-May-2022 Handles missing values- now missing vals are 'unknown'
 #             instead of NA, so rows dont get deleted from dataframe
 ################################################################################
-# Purpose: function for getting all tag detections for any tag deployment
-# given the MOTUS tag deployment ID.
+# Purpose: function for getting  receiver deployment details
+# given the MOTUS receiver deployment ID.
 # 
-# eg:  https://motus.org/data/tagDeploymentDetails?id=32022
+# eg:  https://motus.org/data/receiverDeployment?id=9195 
 #
 # Info: Build the URL and submit to motus. Process the returns to scrape
-# the tag detections.  parse the basic table data 
+# the receiver info.  parse the basic html table data 
 # 
-# Returns an empty data frame if it cant process the results (see function
-# empty_tagdetails_df()
+
+#NEW RETURNS:
+# 
+# Returns the empty_df if deploymentId is not found (
+# Or either a fresh or cached df 
 #
 ################################################################################
 
@@ -38,59 +41,57 @@ library(stringr)
 library(xml2)
 
 ################################################################################
-## create empty tagDeploymentDetails data frame
-## called within tagDeploymentDetails() to return an
+## create empty receiverDeploymentDetails data frame
+## called within receiverDeploymentDetails() to return an
 ## empty data frame when that function has problems with
 ## what comes back from the motus server.
 ## WARNING: BOTH length AND column names need to match exactly
-## what is created by tagDeploymentDetails()
+## what is created by receiverDeploymentDetails()
 ################################################################################
 
-empty_tagDeploymentDetails_df <- function()
+empty_receiverDeploymentDetails_df <- function()
 {
-  df <- data.frame( matrix( ncol = 9, nrow = 1) )
-  colnames(df) <- c('tagid', 'project', 'contact', 'started','species','lat','lon','ndays', 'nreceivers')
+  df <- data.frame( matrix( ncol = 4, nrow = 1) )
+  colnames(df) <- c('receiverid','status','lat','lon')
   df <- df %>% drop_na()
   return (df)
 }
 
 ################################################################################
-#
+# return a dataframe - either processed or empty if an error
 ################################################################################
-tagDeploymentDetails  <- function(tagDeploymentID, useReadCache=1, cacheAgeLimitMinutes=60) 
+receiverDeploymentDetails <- function(receiverDeploymentID, useReadCache=1, cacheAgeLimitMinutes=60) 
 {
-  url <- paste( c('https://motus.org/data/tagDeployment?id=',tagDeploymentID) ,collapse="")    
-  ##url <- paste( c('https://motus.org/data/tagDeployment?id=',32025) ,collapse="")
-  # https://motus.org/data/tagDeployment?id=32025
-  
+  strUrl <- paste( c('https://motus.org/data/receiverDeployment?id=',receiverDeploymentID) ,collapse="")    
+  #url <- paste( c('https://motus.org/data/receiverDeployment?id=',9195) ,collapse="")
+
   DebugPrint("********** Begin - start by testing cache ********")
-  cacheFilename <- paste0(config.CachePath,"/tagDeploymentDetails_",tagDeploymentID,".Rda")
-  
+  cacheFilename <- paste0(config.CachePath,"/receiverDeploymentDetails_",receiverDeploymentID,".Rda")
   df <-readCache(cacheFilename, useReadCache, cacheAgeLimitMinutes)   #see utility_functions.R
-  
+  #df iwill be either the cached dataframe or NA
   if( is.data.frame(df)){
-    DebugPrint("tagDeploymentDetails returning cached file")
-    return(df)
+     DebugPrint("receiverDeploymentDetails returning cached file")
+      return(df)
   } #else was NA
-  
+   
   #prepare an empty dataframe we can return if we encounter errors parsing query results
-  onError_df <- empty_tagDeploymentDetails_df()
+  onError_df <- empty_receiverDeploymentDetails_df()
   
   # we either already returned the valid cache df above and never reach this point,
   # or the cache system wasnt used or didnt return a cached dataframe,
   # so need to call the URL 
+
+  DebugPrint(paste0("make call to motus.org using URL:",strUrl))
   
-  InfoPrint(paste0("make call to motus.org using URL:",url))
-  
-  result <- lapply(url, readUrlWithTimeout)   #see utility_functions.R
-  
+  result <- lapply(strUrl, readUrlWithTimeout, timeoutsecs=config.HttpGetTimeoutSeconds)   #see utility_functions.R
+
   if( is.na(result)){
-    DebugPrint("readUrl() no results - returning empty df (is.na(result) ***")
-    return(onError_df)
+      InfoPrint("readUrl() no results - returning empty df (is.na(result) ***")
+      return(onError_df)
   }
   
   DebugPrint("begin scraping html results")
- 
+  
   #result is a list object, extract the html output and assign to 'page'
   page <- result[[1]]
   
@@ -112,31 +113,31 @@ tagDeploymentDetails  <- function(tagDeploymentID, useReadCache=1, cacheAgeLimit
     return(onError_df)
   }
   
-  
   # next check for any pnode containing:
   # for numeric id can get "No receiver deployment found" 
   # for non-numeric id can get "No receiver deployment found with ID")
-  ans=testPagePnodes(page, "No tag deployment")
+  ans=testPagePnodes(page, "No receiver deployment")
   if (ans==TRUE) {
-    WarningPrint("returning empty df (warning No tag deployment found with ID)")
+    WarningPrint("returning empty df (warning No receiver deployment found with ID)")
     return(onError_df)
   }
   
   ##if in future we care, implement this test
   ##next test page title was as expected
-  #ans=testPageTitlenodes(page, "- Tag deployment - Motus")
+  #ans=testPageTitlenodes(page, "- Receiver deployment - Motus")
   #if (ans==TRUE){
-  #  DebugPrint("Motus responded with expected page title - continue testing response")
+  #  InfoPrint("Motus responded with expected page title - continue testing response")
   #}
-  
+   
   DebugPrint("end initial html result testing")
+  
   
   # *************************************************************
   tbls <- page %>% html_nodes("table")
   
   tbl1 <- html_table(tbls[[1]],fill=TRUE)
   
-  #DebugPrint("***** tagDeploymentDetails  tbl1 ******")
+  #DebugPrint("***** receiverDeploymentDetails  tbl1 ******")
   #print(class(tbl1))
   #print(tbl1)
   
@@ -145,13 +146,13 @@ tagDeploymentDetails  <- function(tagDeploymentID, useReadCache=1, cacheAgeLimit
   
   #print(dim(tbl1))
   
-  tagid <- find4me(tbl1,"Tag:")
-  project <- find4me(tbl1,"Project:")
-  contact <- find4me(tbl1,"Project contact:")
-  started <- find4me(tbl1,"Deployment started:")
-  species <- find4me(tbl1,"Species:")
-  ndays <- find4me(tbl1,"Days detected:")
-  nreceivers <- find4me(tbl1,"Receivers detected by:")
+  status<- find4me(tbl1,"Current status:")
+  #project <- find4me(tbl1,"Project:")
+  #contact <- find4me(tbl1,"Project contact:")
+  #started <- find4me(tbl1,"Deployment started:")
+  #species <- find4me(tbl1,"Species:")
+  #ndays <- find4me(tbl1,"Days detected:")
+  #nreceivers <- find4me(tbl1,"Receivers detected by:")
   location <- find4me(tbl1,"Location:")
   
   #location is string like: "Lat.: 49.1225°, Lon.: -125.8867° (map)"
@@ -172,23 +173,21 @@ tagDeploymentDetails  <- function(tagDeploymentID, useReadCache=1, cacheAgeLimit
     #print(latlon)
     lat <- latlon[2] 
     lon <- latlon[5]
-  } #end if location is unknown
+  } #end else if location is unknown
   
   #create empty frame with one row of nulls
-  df <- empty_tagDeploymentDetails_df()
-  
+  df <- empty_receiverDeploymentDetails_df()
   #append a row with our values
-  df[2, ]<- list(tagid ,project, contact, started, species, lat, lon, ndays, nreceivers )
+  df[2, ]<- list(receiverDeploymentID , status, lat, lon )
   #finally, delete any rows with nulls
   df <- df %>% drop_na()
-
-  if(config.EnableWriteCache == 1){
-    DebugPrint("tagDeploymentDetails writing new cache file.")
-      saveRDS(df,file=cacheFilename)
+  
+  if(config.EnableWriteCache==1){
+     DebugPrint("writing new cache file.")
+     saveRDS(df,file=cacheFilename)
   }
   
-  DebugPrint("tagDeploymentDetails done.")
-
+  DebugPrint("receiverDeploymentDetails done.")
   return(df)
   
 }

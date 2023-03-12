@@ -31,8 +31,13 @@
 ## available in the data/translations dir
 
 # load the translations here
+#suppress translator warning re. 'no translation yaml file' 
+warn = getOption("warn")
+options(warn=-1)
 i18n <- Translator$new(translation_csvs_path = paste0("data/translations"),
                        separator_csv="|")
+options(warn=warn)
+
 
 active_ui_lang <- grep("ui",i18n$get_languages(), invert = TRUE, value = TRUE)
 
@@ -121,20 +126,26 @@ ui_titlebar <- fluidRow(
   titlePanel(   
     tagList(
       # NOTE: Offseting logo -30PX to recover vertical space.. value determined by trial and error
-      div(style="display: inline-block;margin-top:-30px;",img(src = strMainLogoFile, height = numMainLogoHeight)),
+      div(style="display: inline-block;margin-top:-30px;",img(src = config.MainLogoFile, height = config.MainLogoHeight)),
       
       span(style="color:#8FBC8F;font-style: italic;font-size: 25px;", 
   
            div(style="display: inline-block;vertical-align:middle; width: 50%;", textOutput("main_page_title")),
           
+            #a utility action button on titlebar for debugging
+            # if you enable, also enable the observer function in server.R
+            #actionButton("btnCommand","Command"),
+           
+           
            div(style="display: inline-block;vertical-align:top;width:120px", pickerInput(inputId = "receiver_pick",
                                               #label = "",
                                               label = i18n$t("ui_mainpage_available_receivers"),
                                               width = 170,
                                               #choices = gblReceivers_df["Name"],
-                                              choices = lstReceiverShortNames,
+                                              choices = config.ReceiverShortNames,
                                               options = pickerOptions(container = "body")
                                               )) ,
+           
             
            span(
              tags$div(  tags$style(".jhr{
@@ -166,7 +177,7 @@ ui_titlebar <- fluidRow(
 ###############################################################################
 ## assemble the UI from the pieces
 ###############################################################################
-ui <- fluidPage(
+ui <- fluidPage( 
   tags$script(inactivity),    
   ui_titlebar,
   ui_navbar,
@@ -178,13 +189,28 @@ ui <- fluidPage(
             margin-bottom: 0.25em;"
             ),
   
-  textOutput("footer")%>% 
-    tagAppendAttributes(style= 'font-size: 10px;
+  span(
+    div(
+      textOutput("footer")%>% 
+      tagAppendAttributes(style= 'font-size: 10px;
                         padding: 1px;
                         margin-bottom: 1px;
                         margin-top: 1px;
                         margin-left: 10px;
+                        display: inline-block;
+                        ') ,
+  
+     textOutput("motusState")%>% 
+     tagAppendAttributes(style= 'font-size: 10px;
+                        padding: 1px;
+                        margin-bottom: 1px;
+                        margin-top: 1px;
+                        margin-left: 10px;
+                        display: inline-block;
+                        position:absolute;right:2em;
                         ') 
+    ) # end div
+  ) # end span
   
 )   # end of ui definition
 

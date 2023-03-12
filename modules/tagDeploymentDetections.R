@@ -62,7 +62,7 @@ rows = function(x) lapply(seq_len(nrow(x)), function(i) lapply(x,"[",i))
 
 empty_tagDeploymentDetection_df <- function()
 {
-  df <- data.frame( matrix( ncol = 4, nrow = 1) )
+  df <- data.frame( matrix( ncol = 5, nrow = 1) )
   df <- df %>% drop_na()
   colnames(df) <- c('date', 'site', 'lat', 'lon', 'receiverDeploymentID')
   return (df)
@@ -72,7 +72,7 @@ empty_tagDeploymentDetection_df <- function()
 ################################################################################
 #
 ################################################################################
-tagDeploymentDetections <- function(tagDeploymentID) 
+tagDeploymentDetections <- function(tagDeploymentID, useReadCache=1, cacheAgeLimitMinutes=60) 
 {
 
   #possible detections returns are limited to 100 by default
@@ -81,94 +81,82 @@ tagDeploymentDetections <- function(tagDeploymentID)
 url <- paste( c('https://motus.org/data/tagDeploymentDetections?id=',tagDeploymentID,'&n=1000') ,collapse="")    
 ##url <- paste( c('https://motus.org/data/tagDeploymentDetections?id=',32025) ,collapse="")
 
-#print(url)
-#print(" ----------- entered tagDeplymentDetections.R -------")
-#print(paste0("using tagDeploymentID:",tagDeploymentID))
+
+cacheFilename = paste0(config.CachePath,"/tagDeploymentDetections_",tagDeploymentID,".Rda")
 
 
-readUrl <- function(url) {
-  out <- tryCatch(
-    {
-      # The return value of `readLines()` is the actual value 
-      # that will be returned in case there is no condition 
-      # (e.g. warning or error). 
-      # You don't need to state the return value via `return()` as code 
-      # in the "try" part is not wrapped inside a function (unlike that
-      # for the condition handlers for warnings and error below)
-      read_html(url)
-    },
-    error=function(cond) {
-      message(paste("URL caused ERROR  does not seem to exist:", url))
-      message("Here's the original error message:")
-      message(cond)
-      return(NA)
-    },
-    warning=function(cond) {
-      message(paste("URL caused a WARNING:", url))
-      message("Here's the original warning message:")
-      message(cond)
-      return(NA)
-    },
-    finally={
-      # NOTE:
-      # Here goes everything that should be executed at the end,
-      # regardless of success or error.
-      # If you want more than one expression to be executed, then you 
-      # need to wrap them in curly brackets ({...}); otherwise you could
-      # just have written 'finally=<expression>' 
-      message(paste("tagDeploymentDetections Processed URL:", url))
-    }
-  )    
-  return(out)
-}
-result <- lapply(url, readUrl)
-#print(class(result))
+df <-readCache(cacheFilename, useReadCache, cacheAgeLimitMinutes)   #see utility_functions.R
+
+if( is.data.frame(df)){
+  DebugPrint("tagDeploymentDetections returning cached file")
+  return(df)
+} #else was NA
+
+#prepare an empty dataframe we can return if we encounter errors parsing query results
+onError_df <- empty_tagDeploymentDetection_df()
+
+# we either already returned the valid cache df above and never reach this point,
+# or the cache system wasnt used or didnt return a cached dataframe,
+# so need to call the URL 
+
+InfoPrint(paste0("make call to motus.org using URL:",url))
+
+result <- lapply(url, readUrlWithTimeout)   #see utility_functions.R
 
 if( is.na(result)){
-  df <- empty_tagDeploymentDetection_df()
-  print("*** tagDeploymentDetections returning empty df ***")
-  return(df)
+  DebugPrint("readUrl() no results - returning empty df (is.na(result) ***")
+  return(onError_df)
 }
 
+DebugPrint("begin scraping html results")
+
+#result is a list object, extract the html output and assign to 'page'
 page <- result[[1]]
-#print(class(page))
 
-#get all the <p> nodes and look for warnings
-pnodes <- html_nodes(page, "p")
-#print("length of pnodes is:")
-#print (length(pnodes))
-#print(pnodes[1])
-#print(pnodes[2])
-
-#print("printing pnodes")
-#print(pnodes)
-
-##### check for any pnode containing  ########
-# for numeric tagid can get "No tag deployment found" 
-# for non-numeric tagid can get "No tag deployment ID found")
-
-
-# note.. turn off warnings tha str_detects about
-#  argument is not an atomic vector; coercing
-
-warn = getOption("warn")
-options(warn=-1)
-ans <- str_detect( toString(pnodes), "No receiver deployment" )
-options(warn=warn)
-
-#print( ans )
-
-newans <- any(ans, na.rm = TRUE)  #colapse vector to one element
-#print (newans)
-
-if (newans > 0) {
-  print("No tag deployment found with ID")
-  ##create data frame with 0 rows 
-  df = empty_tagDeploymentDetection_df()
-  print("tagDeploymentDetections returning empty df")
-  return (df)
-
+#first test if its an xml document
+ans<-is(page,"xml_document")
+if(ans==TRUE){ 
+  DebugPrint("We got an xml document page")
+}else{
+  DebugPrint("We dont have an xml document - returning onError df")
+  return(onError_df)
 }
+
+# next test for a redirect to motus HomePage 
+# eg. if called with an ID that doesnt exist,
+# motus.org may just redirect us to the motus.org home page. Here I test for the homepage title
+ans=testPageTitlenodes(page, "Motus Wildlife Tracking System")
+if (ans==TRUE) {
+  WarningPrint("Motus redirected to homepage. Likely no tag deployment found with ID. Returning empty df (Redirected) ")
+  return(onError_df)
+}
+
+# next check for any pnode containing:
+# for numeric id can get "No tag deployment found" 
+# for non-numeric id can get "No tag deployment found with ID")
+ans=testPagePnodes(page, "No tag deployment")
+if (ans==TRUE) {
+  WarningPrint("returning empty df (warning No tag deployment found with ID)")
+  return(onError_df)
+}
+
+##if in future we care, implement this test
+##next test page title was as expected
+#ans=testPageTitlenodes(page, "Detections - Tag deployment")
+#if (ans==TRUE){
+#  DebugPrint("Motus responded with expected page title - continue testing response")
+#}
+
+DebugPrint("end initial html result testing")
+
+
+# *************************************************************
+
+
+
+
+
+
 
 
 tbls <- page %>% html_nodes("table")
@@ -183,16 +171,6 @@ num.cols<-dim(tbl1)[2]
 num.rows<-dim(tbl1)[1]
 #print(dim(tbl1))
 
-
-
-#for(i in 1:num.rows){
-#  print("-----------------")
-#  print( tbl1[[1]][i] ) 
-#  print( tbl1[[2]][i] )
-#  print( tbl1[[3]][i]  )
-#  print( tbl1[[4]][i] )
-#}
-
 # create five empty 'vectors'
 date<-c()
 site<-c()
@@ -203,8 +181,6 @@ receiverDeploymentID<-c()
 #> print(class(tbl1[[1]][i]))  
 #[1] "character"
 # table entries are all class "character"
-
-
 
 # html results node may have a 'row' of sort controls as a 'table footer' 
 # if it is there, then the first column of the last row will be the
@@ -275,13 +251,13 @@ for (node in a_nodes) {
 df <-data.frame(date,site,lat,lon,receiverDeploymentID)
 
 # flight data exclusions from .csv file read by global.R
-if( length(exclude_df > 0 )){
-  for(i in 1:nrow(exclude_df)) {
-      row <- exclude_df[i,]
+if( length(gblExclude_df > 0 )){
+  for(i in 1:nrow(gblExclude_df)) {
+      row <- gblExclude_df[i,]
       theDate=row[[1]]
       theID=row[[2]]
       theSite=row[[3]]
-      print(paste0("exclude"," date:",theDate, "  id:", theID,"  site:", theSite))
+      ##print(paste0("exclude"," date:",theDate, "  id:", theID,"  site:", theSite))
       df <- df[!(df$receiverDeploymentID == theID & df$date == theDate),] 
    }
 }
@@ -290,5 +266,11 @@ if( length(exclude_df > 0 )){
 
 #finally, delete any rows with nulls
 df <- df %>% drop_na()
+
+if(config.EnableWriteCache == 1){
+  DebugPrint("writing new cache file.")
+  saveRDS(df,file=cacheFilename)
+}
+DebugPrint("tagDeploymentDetections done.")
 return(df)
 }

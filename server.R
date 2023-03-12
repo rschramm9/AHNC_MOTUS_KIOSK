@@ -32,21 +32,77 @@ server <- function(input, output, session) {
 
   # Load translations
   # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+  
+  #suppress translator warning re. 'no translation yaml file' 
+  warn = getOption("warn")
+  options(warn=-1)
   i18n <- Translator$new(translation_csvs_path = paste0("data/translations"),
                          separator_csv="|")
+  options(warn=warn)
+  
   i18n$set_translation_language(default_UI_lang)
-
+  
+  ##############################################################
+  #reactive variable for displaying motus on/off status on GUI
+  #result<-receiverDeploymentDetails(defaultReceiverID, useReadCache=0) 
+  #this creates and sets a global variable 'motus' to be a reactive value so
+  #it can be observed
+  motusServer<<-reactiveValues(status=FALSE,msg="MotusStatus:Unknown")
+  # this binds the observer (an output) to the reactive value
+  #output$motusState<-renderText({motusServer$status})
+  output$motusState<-renderText({motusServer$msg})
+  ##############################################################
+  #reactive timer to go test Motus periodically to see if online
+  #autoInvalidate <- reactiveTimer(numCheckMotusUpIntervalSeconds) #60 seconds
+  millisecs <- config.CheckMotusIntervalMinutes*60*1000 #milliseconds #see config file settings
+  autoInvalidate <- reactiveTimer(millisecs)
+  
   
   # render the versioning text string set in global.R to the
   # main page footer output
   output$footer<-renderText({gblFooterText})
   
+# this button is for debugging the motusServer$state reactive variable
+#if you enable the observer here, also enable it in the ui.R
+#  observeEvent(input$btnCommand, { 
+#    DebugPrint("Button pressed.")
+#
+#  })
   
+  
+  #watch for timer to fire, reset it  and then go check on motus
+  #sets reactive (global) variable
+  observe({
+    ## Invalidate and re-execute this reactive expression
+    ## every time the timer fires.
+    DebugPrint("Timer fired.")
+    autoInvalidate()
+    
+    # result<-receiverDeploymentDetails(defaultReceiverID, useReadCache=numEnableCache) 
+    # for the purpose of testing if Motus.org is up, we dont want to use cache to
+    # force the function to hit the remote server.
+    start_time <- Sys.time()
+    result<-receiverDeploymentDetails(defaultReceiverID, useReadCache=0) #dont care about cache age...
+    end_time <- Sys.time()
+    elapsedtime=(end_time-start_time)
+    InfoPrint(paste0("Back from html call - Elapsed time:",elapsedtime," secs"))
+    
+    if(nrow(result) > 0){
+      if( motusServer$status == FALSE){  WarningPrint("Motus now online") }
+      motusServer$msg<<-"MotusStatus:Online"
+      motusServer$status<<-TRUE 
+    } else{ #is the empty_df
+      if( motusServer$status == TRUE){ WarningPrint("Motus went offline")}
+      motusServer$msg<<-"MotusStatus:Offline"
+      motusServer$status<<-FALSE
+    }
+    
+  })
   
   
   # On inactivity timeout, reset the dashboard UI to startup defaults
   observeEvent(input$timeOut, { 
-    print(paste0("Session (", session$token, ") timed out at: ", Sys.time()))
+    #print(paste0("Session (", session$token, ") timed out at: ", Sys.time()))
     session$reload()
   })
   
@@ -77,7 +133,7 @@ server <- function(input, output, session) {
   observeEvent(input$receiver_pick, {
     output$main_page_title<-renderText({
       dynamic_title <- input$receiver_pick
-      paste(strMainTitle, dynamic_title)})
+      paste(config.MainTitle, dynamic_title)})
     
   })  #end observeEvent input$receiver_pick
   

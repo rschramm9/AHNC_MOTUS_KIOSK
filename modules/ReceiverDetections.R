@@ -135,11 +135,11 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
     
      # icon location an size from kiosk.cfg, set in global.R
     birdIcon <- makeIcon(
-      iconUrl = strMovingMarkerIcon,
-      iconWidth = numMovingMarkerIconWidth, iconHeight = numMovingMarkerIconHeight,
+      iconUrl = config.MovingMarkerIcon,
+      iconWidth = config.MovingMarkerIconWidth, iconHeight = config.MovingMarkerIconHeight,
       iconAnchorX = 0, iconAnchorY = 0,
-      shadowUrl = strMovingMarkerIcon,
-      shadowWidth = numMovingMarkerIconWidth, shadowHeight = numMovingMarkerIconHeight,
+      shadowUrl = config.MovingMarkerIcon,
+      shadowWidth = config.MovingMarkerIconWidth, shadowHeight = config.MovingMarkerIconHeight,
       shadowAnchorX = 0, shadowAnchorY = 0
     )
     
@@ -178,7 +178,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
     #to load a species info html file containiong a photo and some interesting facts
     #about the currently selected bird 
     updateSpeciesInfo <- function() {    
-   
+    DebugPrint("update species")
     #file like "/Users/rich/Projects/AHNC_MOTUS_KIOSK/www/docs/species_unknown_en.html") 
 
     #get the default 'species_unknown' html filename matching the current language    
@@ -204,15 +204,30 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
    myTagsToTable <- function(x) {
 
    #note <<- is assignment to global variable, also note receiverDeploymentID is global
-   detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
-
+   #detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
+   detections_df <<- receiverDeploymentDetections(receiverDeploymentID, config.EnableReadCache, config.CacheAgeLimitMinutes)
+   DebugPrint("back from receiverDeploymentDetection.. results follow ")
+   #str(detections_df)
+   
+   if( !is.data.frame(detections_df)){
+     DebugPrint("receiverDeploymentDetections failed to return a dataframe... exit function")
+     return()
+   }
+   
+   
+   DebugPrint("sort the detections")
    #sort detections so most recent appears at top of list notice we are woking with a global variable ( <<- )
    detections_df <<- detections_df[ order(detections_df$tagDetectionDate,decreasing = TRUE), ]
-
+   DebugPrint("back sort.. results follow ")
+   #str(detections_df)
+   
    #subset the data frame to form a frame with only the columns we want to show
    # note also it's a global assignment 
    detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
-         
+  
+   DebugPrint("back from subset.. results follow ")
+   #str(detections_subset_df)
+        
    output$mytable <- DT::renderDataTable(detections_subset_df,
                                             selection = list(mode = 'single',
                                             selected = c(1) ),
@@ -233,7 +248,11 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
                                                          scrollX = TRUE,
                                                          scrollY = 700
                                             ))
+   
+    DebugPrint("back from output table ")
     } # end function myTagsToTable
+    
+    
 
    #-------------------------------------------------------------------------------------------------------------
    #   
@@ -241,7 +260,9 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
      
     observeEvent( session$clientData, {
       #  message("**session started ***")
+      DebugPrint("enter session started observerEvent")
       myTagsToTable()
+      DebugPrint("session started observerEvent back from tags to table,,, exiting event")
     }) #end observeEvent for session start
     
     #-------------------------------------------------------------------------------------------------------------
@@ -299,53 +320,69 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
         #lowercase
         species_key <<- tolower(species_key)
         
+        DebugPrint("input$mytable_rows_selected observeEvent()")
+        DebugPrint("calling updateSpeciesInfo")
         updateSpeciesInfo()
+        DebugPrint("back from updateSpeciesInfo")
         
         if (is.na(tagDepID )) {
+          DebugPrint("input$mytable_rows_selected observeEvent() - is.na tagDepID")
             mydf <- data.frame( matrix( ncol = 9, nrow = 1) )
             colnames(mydf) <- c('tagid', 'project', 'contact', 'started','species','lat','lon','ndays', 'nreceivers')
             tagdetails_df <- mydf
         } else {
+          DebugPrint(paste0("input$mytable_rows_selected observeEvent() - else calling tagDeploymentDetails w/tagDepID=",tagDepID))
            #next get and render the tagDeploymentDetails (who tagged, where, when etc)
-           tagdetails_df <- tagDeploymentDetails(tagDepID)  
+           tagdetails_df <- tagDeploymentDetails(tagDepID, config.EnableReadCache, config.CacheAgeLimitMinutes)
+           DebugPrint("back from tagDeploymentDetails")
         }
         
+        DebugPrint("input$mytable_rows_selected observeEvent() - renderTable")
         output$tagdetail <- DT::renderDataTable(tagdetails_df,
                                                 selection = "single", 
                                                 options=list(dom = 'Bfrtip',
                                                              searching = F
                                                              ))
         
+        
+        DebugPrint("input$mytable_rows_selected observeEvent() - start on flight data")
+        
         #if the tag deployment id is null there wont be any flight data, so just make an empty one
         if (is.na(tagDepID )) {
+             DebugPrint("input$mytable_rows_selected observeEvent() - tagDepID is null so make dummy mydf")
              mydf <- data.frame( matrix( ncol = 5, nrow = 1) )
              colnames(mydf) <- c('date', 'site', 'lat', 'lon', 'receiverDeplymentID')
              tagflight_df<-mydf
        } else {
              #next get all of the detections associated with this tag deployment
              # note this is a local variable assignment
-           
-             tagflight_df <- tagDeploymentDetections(tagDepID)
+             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - tagID NOT NA so call tagDeploymentDetections with tagDepID:",tagDepID))
+             #tagflight_df <- tagDeploymentDetections(tagDepID)
+             tagflight_df <- tagDeploymentDetections(tagDepID, config.EnableReadCache, config.CacheAgeLimitMinutes)
+             
+             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - back from tagDeploymentDetections()"))
              
              #add the tag deployment release point data to the flight path dataset
              #there has to be a better way but my R convert datetime to date skills arent up to it...
+             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - get release point"))
              releasepoint_df<-tagdetails_df[c("started","species","lat","lon")]
              my_date<-as_date(releasepoint_df$started)
              my_site<-"Tagged"
              my_lat = releasepoint_df$lat
              my_lon = releasepoint_df$lon
              my_receiverDeployment=0
+             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - add point to tagflight_df"))
              tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon,my_receiverDeployment)
 
              
              
-             
+             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - sort tagflight_df"))
              #sort flight detection so most recent appears at bottom of the list
              tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
 
        } #end if
 
- 
+        DebugPrint(paste0("input$mytable_rows_selected observeEvent() - render tagflight_df as table"))
        # and render it
         output$flightpath <- DT::renderDataTable(tagflight_df,
                                                  selection = "single", 
@@ -443,9 +480,12 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
     # note the main page server.R also has an event observer for this input
     # note rcvr() is handle to the receivers input picklist passed in from server.R
     observeEvent(rcvr(), {
+      DebugPrint("recvr picker observerEvent")
       # NOTE the use of global assignments
       strReceiverShortName <<- rcvr()  #global assignment
-
+      
+      DebugPrint(paste0("recvr picker observerEvent strReceiverShortName", strReceiverShortName))
+      
       # on new receiver selection via the picker
       # update the global string strReceiverShortName
       # and use it to filter the global dataframe of shortnames and ID's to update
@@ -455,8 +495,10 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
       selectedreceiver <- filter(gblReceivers_df, shortName == strReceiverShortName)      
       receiverDeploymentID <<- selectedreceiver["receiverDeploymentID"]
       
+      DebugPrint(paste0("recvr picker observerEvent receiverDeploymentID", receiverDeploymentID))
       myTagsToTable()
- 
+      DebugPrint("recvr picker observerEvent back from tags to table")
+      
     })  #end observeEvent input$receiver_pick
   
     

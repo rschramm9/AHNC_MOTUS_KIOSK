@@ -36,6 +36,9 @@
 library(stringr)
 library(xml2)
 
+### FOR TESTING TIMOUTS
+library(httr)
+
 ################################################################################
 ## create empty receiverDeploymentDetections data frame
 ## called within receiverDeploymentDetections() to return an
@@ -52,7 +55,6 @@ empty_receiverDeploymentDetection_df <- function()
   return (df)
 }
 
-
 ################################################################################
 # Purpose: function for getting all tag detections at receiver given
 # the MOTUS receiverDeployment ID.
@@ -67,95 +69,81 @@ empty_receiverDeploymentDetection_df <- function()
 # empty_receiverdetection_df()
 #
 ################################################################################
-receiverDeploymentDetections <- function(rcvrDepID) 
+receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, cacheAgeLimitMinutes=60) 
 {
+  
   #url <- paste( c('https://motus.org/data/receiverDeploymentDetections?id=7948') ,collapse="")
-  #possible detections returns are limited to 100 by default
-  #if so - might try https://motus.org/data/receiverDeploymentDetections?id=',tagDeploymentID,'&n=1000' ?
-  #where n is a hidden argument(see page source)
-  url <- paste( c('https://motus.org/data/receiverDeploymentDetections?id=', rcvrDepID,'&n=1000') ,collapse="")
-  #print(url)
-  #print("==================== in receiverDeploymentDetections() ==========================")
-  readUrl <- function(url) {
-    out <- tryCatch(
-      {
-        # The return value of `readLines()` is the actual value 
-        # that will be returned in case there is no condition 
-        # (e.g. warning or error). 
-        # You don't need to state the return value via `return()` as code 
-        # in the "try" part is not wrapped inside a function (unlike that
-        # for the condition handlers for warnings and error below)
-        
-        #message("this is the try")
-        read_html(url)
-      },
-      error=function(cond) {
-        # traps HTTP 404 returns
-        message(paste("receiverDeploymentDetections URL caused ERROR does not seem to exist:", url))
-        message("Here's the original error message:")
-        message(cond)
-        return(NA)
-      },
-      warning=function(cond) {
-        message(paste("receiverDeploymentDetections URL caused a WARNING:", url))
-        message("Here's the original warning message:")
-        message(cond)
-        return(NA)
-      },
-      finally={
-        # NOTE:
-        # Here goes everything that should be executed at the end,
-        # regardless of success or error.
-        # If you want more than one expression to be executed, then you 
-        # need to wrap them in curly brackets ({...}); otherwise you could
-        # just have written 'finally=<expression>' 
-        message(paste("receiverDeploymentDetections Processed URL:", url))
-      }
-    )    
-    return(out)
-  }
-  result <- lapply(url, readUrl)
-  #print(class(result))
+  #possible detections motus returns are limited to 100 by default
+  #so we use the hidden &n argument: https://motus.org/data/receiverDeploymentDetections?id=',receiverDeploymentID,'&n=1000' 
+  url <- paste( c('https://motus.org/data/receiverDeploymentDetections?id=', receiverDeploymentID,'&n=1000') ,collapse="")
+  
+  DebugPrint("********** Begin - start by testing cache ********")
+  cacheFilename <- paste0(config.CachePath,"/receiverDeploymentDetections_",receiverDeploymentID,".Rda")
+  df <-readCache(cacheFilename, useReadCache, cacheAgeLimitMinutes)   #see utility_functions.R
+  
+  if( is.data.frame(df)){
+    DebugPrint("receiverDeploymentDetails returning cached file")
+    return(df)
+  } #else was NA
+  
+  #prepare an empty dataframe we can return if we encounter errors parsing query results
+  onError_df <- empty_receiverDeploymentDetection_df()
+  
+  # we either already returned the valid cache df above and never reach this point,
+  # or the cache system wasnt used or didnt return a cached dataframe,
+  # so need to call the URL 
+  
+  InfoPrint(paste0("make call to motus.org using URL:",url))
+  
+  result <- lapply(url, readUrlWithTimeout)   #see utility_functions.R
   
   if( is.na(result)){
-    df <- empty_receiverDeploymentDetection_df()
-    print("*** receiverDeploymentDetections returning empty df ***")
-    return(df)
-    
+    InfoPrint("readUrl() no results - returning empty df (is.na(result) ***")
+    return(onError_df)
   }
   
+  DebugPrint("begin scraping html results")
   page <- result[[1]]
   #print(class(page))
   
-  #for motus.org, also need to look for some <p> .... </p) warning text...
-  #get all the <p> nodes and look for warnings
-  pnodes <- html_nodes(page, "p")
-  #print("length of pnodes is:")
-  #print (length(pnodes))
-  #print(pnodes[1])
-  #print(pnodes[2])
-  
-  ##### check for any pnode containing the following ########
-  #for numeric receiver id can get: No receiver deployment found with ID = 7
-  #for non numeric receiver id can get: No receiver deployment ID found
-  
-  # note.. turn off warnings that str_detects warns
-  #  "argument is not an atomic vector; coercing.."
-  
-  warn = getOption("warn")
-  options(warn=-1)
-  ans <- str_detect( toString(pnodes), "No receiver deployment" )
-  options(warn=warn)
-  
-  newans <- any(ans, na.rm = TRUE)  #collapse vector to one element
-
-  if (newans > 0) {
-    print("No receiver deployment found with that ID")
-    ##create data frame with 0 rows 
-    df = empty_receiverDeploymentDetection_df()
-    print("receiverDeploymentDetections returning empty df")
-    return (df)
+  #first test if its an xml document
+  ans<-is(page,"xml_document")
+  if(ans==TRUE){ 
+    DebugPrint("We got an xml document page")
+  }else{
+    DebugPrint("We dont have an xml document - returning onError df")
+    return(onError_df)
   }
+  
+  # next test for a redirect to motus HomePage 
+  # eg. if called with an ID that doesnt exist,
+  # motus.org may just redirect us to the motus.org home page. Here I test for the homepage title
+  ans=testPageTitlenodes(page, "Motus Wildlife Tracking System")
+  if (ans==TRUE) {
+    WarningPrint("Motus redirected to homepage. Likely no receiver deployment found with ID. Returning empty df (Redirected) ")
+    return(onError_df)
+  }
+  
+  # next check for any pnode containing:
+  # for numeric id can get "No receiver deployment found" 
+  # for non-numeric id can get "No receiver deployment found with ID")
+  ans=testPagePnodes(page, "No receiver deployment")
+  if (ans==TRUE) {
+   WarningPrint("returning empty df (warning No receiver deployment found with ID)")
+    return(onError_df)
+  }
+  
+  ##if in future we care, implement this test
+  ##next test page title was as expected
+  #ans=testPageTitlenodes(page, "Detections - ")
+  #if (ans==TRUE){
+  #  DebugPrint("Motus responded with expected page title - continue testing response")
+  #}
+  
+  DebugPrint("end initial html result testing")
+  
+  
+  # *************************************************************
   
   # now extract the data table
   tbls <- page %>% html_nodes("table")
@@ -260,9 +248,17 @@ receiverDeploymentDetections <- function(rcvrDepID)
   
   
   df <-data.frame(tagDetectionDate,tagDeploymentID,tagDeploymentName,species,tagDeploymentDate,lat,lon)
+  #colnames(df) <- c('tagDetectionDate','tagDeploymentID','tagDeploymentName','species','tagDeploymentDate','lat','lon')
+  
   #delete nulls
   df <- df %>% drop_na()
   #print(df)
+  
+  if(config.EnableWriteCache == 1){
+    DebugPrint("receiverDeploymentDetections writing new cache file.")
+     saveRDS(df,file=cacheFilename)
+  }
+  DebugPrint("receiverDeploymentDetections done.")
   return(df)
   
 }
