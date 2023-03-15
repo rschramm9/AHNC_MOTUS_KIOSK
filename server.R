@@ -127,12 +127,21 @@ server <- function(input, output, session) {
     # by position.
     update_lang(session=session, language=input$lang_pick)
     
+    #choose the correct homepage given language selected on UI
+    x=input$lang_pick
+    if(x=='en'){
+      thepage<-config.HomepageEnglish  
+    } else { 
+      thepage<-config.HomepageSpanish
+    }
+    
     # Refresh readme file on the main home page tab of the navbar
     removeUI(selector ="#readmediv", immediate = TRUE)
     insertUI(immediate = TRUE,
              selector = '#readmehere', session=session,
              ui = div(id="readmediv",
-                includeHTML( as.character(i18n$get_translations()["ui_mainpage_readmefile",input$lang_pick]) )
+                #includeHTML( as.character(i18n$get_translations()["ui_mainpage_readmefile",input$lang_pick]) )
+                includeHTML( as.character(thepage) )
              )
     ) #end insertUI
     

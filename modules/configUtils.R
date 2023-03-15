@@ -83,11 +83,35 @@ getConfig <- function() {
     config.MainLogoHeight <<- as.numeric(list1[1]) #assume length=1
   }
   
+  
+  #print("------------ HomepageEnglish ----------------")
+  list1 <- keyValueToList(configtbl,'HomepageEnglish')
+  if( is.null(list1) ){
+    # path is relative to the www/ directory
+    config.HomepageEnglish<<-"www/docs/default_homepage_en.html"
+  } else {
+    #I ultimately want a string
+    config.HomepageEnglish<<- toString(list1[1])  
+  }
+  
+  
+  #print("------------ HomepageSpanish ----------------")
+  list1 <- keyValueToList(configtbl,'HomepageSpanish')
+  if( is.null(list1) ){
+    # path is relative to the www/ directory
+    config.HomepageSpanish<<-"www/docs/default_homepage_es.html"
+  } else {
+    #I ultimately want a string
+    config.HomepageSpanish<<- toString(list1[1])  
+  }
+  
+  
   #print("------------ ReceiverDeploymentID --------------")
   # set global parms of both the list and the first item on the list
   #the default target receiver is the first list item (set in global.R after processing config)
   config.ReceiverDeployments <<- keyValueToList(configtbl,'ReceiverDeploymentID')
-  if( is.null(list1) ){
+  
+  if( is.null(config.ReceiverDeployments)  ){
     message("Config is missing list of Receiver Deployment IDs")
     badCfg<-TRUE 
   }
@@ -231,6 +255,10 @@ printConfig <- function() {
   TSprint(paste0("MainTitle:",config.MainTitle))
   
   TSprint(paste0("MainLogoHeight:",config.MainLogoHeight))
+  
+  TSprint(paste0("HomepageEnglish:",config.HomepageEnglish))
+  
+  TSprint(paste0("HomepageSpanish:",config.HomepageSpanish))
   
   if ( is.list( config.ReceiverDeployments)){
     for (i in 1:length(config.ReceiverDeployments)) {
