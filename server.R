@@ -46,6 +46,11 @@ server <- function(input, output, session) {
   # Load translations
   # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
   
+  
+
+  session$sendCustomMessage("color_change",config.NavbarColor)
+  
+  
   #suppress translator warning re. 'no translation yaml file' 
   warn = getOption("warn")
   options(warn=-1)
@@ -77,10 +82,11 @@ server <- function(input, output, session) {
   
 # this button is for debugging the motusServer$state reactive variable
 #if you enable the observer here, also enable it in the ui.R
-#  observeEvent(input$btnCommand, { 
-#    DebugPrint("Button pressed.")
-#
-#  })
+  observeEvent(input$btnCommand, { 
+    InfoPrint("Button pressed.")
+    session$sendCustomMessage("color_change", "#8FBC8F")
+
+  })
   
   
   #watch for timer to fire, reset it  and then go check on motus
@@ -131,8 +137,12 @@ server <- function(input, output, session) {
     x=input$lang_pick
     if(x=='en'){
       thepage<-config.HomepageEnglish  
-    } else { 
+    } else if (x=='es'){ 
       thepage<-config.HomepageSpanish
+    } else if (x=='fr'){ 
+      thepage<-config.HomepageFrench
+    } else {
+      thepage<-config.HomepageEnglish 
     }
     
     # Refresh readme file on the main home page tab of the navbar

@@ -44,7 +44,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.0.1  15-Mar-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.1.0  21-Mar-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -113,8 +113,6 @@ source("modules/receiverDeploymentDetails.R")
        #printConfig()
        #}
      #print("-----------------Done processing config----------------------------------")
-     
-     
      #set your desired log level in your config file
      #convert the string from config file to numeric constant from above
      LOG_LEVEL=switch(
@@ -147,60 +145,72 @@ source("modules/receiverDeploymentDetails.R")
      # Initially populate the dataframes here
      # we want these to be global variables... (note the <<- ) 
      InfoPrint(paste0("global.R Make initial call to motus for receiverDeploymentDetections of receiver:", receiverDeploymentID))
-     detections_df <<- receiverDeploymentDetections(receiverDeploymentID, config.EnableReadCache, config.CacheAgeLimitMinutes)
-     
+     detections_df <<- receiverDeploymentDetections(receiverDeploymentID, config.EnableReadCache, config.ActiveCacheAgeLimitMinutes)
+     if(nrow(detections_df)<=0) {  # failed to get results... try the inactive cache
+       InfoPrint("initial receiverDeploymentDetections request failed - try Inactive cache")
+       detections_df <<- receiverDeploymentDetections(receiverDeploymentID, config.EnableReadCache, config.InactiveCacheAgeLimitMinutes)
+     }
+
      detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
 
-     # read a csv file for any known bad detections that we wwant the gui to ignore
+     # read a csv file for any known bad tag detections that we want the gui to ignore
+     # these are individual detections of a tag at some receiver - eg wild point 
+     # false detections
      # this hack isnt scalable but for now....
      tryCatch ( 
      {  
-         f <- paste0(getwd(),"/exclude_detections",".csv")
+         f <- paste0(getwd(),"/exclude_tag_detections",".csv")
          if (file.exists(f)){
-            gblExclude_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
-            gblExclude_df[[1]] <- as.Date(gblExclude_df[[1]])
-         } else { gblExclude_df= NULL }
+            gblExcludeTagDetections_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
+            gblExcludeTagDetections_df[[1]] <- as.Date(gblExcludeTagDetections_df[[1]])
+         } else { gblExcludeTagDetections_df= NULL }
     
      },
      warning = function( w )
      {
          WarningPrint("") # dummy warning function to suppress the output of warnings
-         gblExclude_df= NULL
+         gblExcludeTagDetections_df= NULL
      },
      error = function( err )
      {
-       ErrorPrint("exclude_detections.csv read error")
+       ErrorPrint("exclude_tag_detections.csv read error")
        ErrorPrint("here is the err returned by the read:")
        ErrorPrint(err)
-       gblExclude_df= NULL
+       gblExcludeTagDetections_df= NULL
      } )
+
      
-#     ### work in progress... not filtering these yet.
-#     tryCatch ( 
-#       {  
-#         f <- paste0(getwd(),"/suspect_detections",".csv")
-#         if (file.exists(f)){
-#           suspect_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
-#           suspect_df[[1]] <- as.Date(suspect_df[[1]])
-#         } else { suspect_df= NULL }
-#         
-#       },
-#       warning = function( w )
-#       {
-#         WarningPrint("") # dummy warning function to suppress the output of warnings
-#         suspect_df= NULL
-#       },
-#       error = function( err )
-#       {
-#         ErrorPrint("suspect_detections.csv read error")
-#         ErrorPrint("here is the err returned by the read:")
-#         TErrorPrint(err)
-#         suspect_df= NULL
-#       } )
-#     #print(suspect_df)
+     # read a csv file for any known bad tags that we want the gui to
+     # ignore any detection of a tag with this id
+     # this would mean all detections of this tag at any receiver - eg for 
+     # for a 'test tag' used a site
+     # this hack isnt scalable but for now....
+     ###### work in progress... not filtering these yet.
+     tryCatch ( 
+       {  
+         f <- paste0(getwd(),"/exclude_tags",".csv")
+         if (file.exists(f)){
+           gblExcludeTag_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
+           gblExcludeTag_df[[1]] <- as.Date(gblExcludeTag_df[[1]])
+         } else { gblExcludeTag_df= NULL }
+       },
+       warning = function( w )
+       {
+         WarningPrint("") # dummy warning function to suppress the output of warnings
+         gblExcludeTag_df= NULL
+       },
+       error = function( err )
+       {
+         ErrorPrint("exclude_tags.csv read error")
+         ErrorPrint("here is the err returned by the read:")
+         TErrorPrint(err)
+         gblExcludeTag_df= NULL
+       } )
+      #print(gblExcludeTag_df)
     
-    
-     # enable this code block to run to rebuild cache
+     ##################################################
+     # enable this code block to run to completely rebuild cache
+     ##################################################
      if (1==2){ #rebuild cache
        for (i in 1:nrow(gblReceivers_df)) {
          row <- gblReceivers_df[i,]

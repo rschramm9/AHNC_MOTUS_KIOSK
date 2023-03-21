@@ -40,8 +40,9 @@
 # the basic table data and then for the tagDeploymentID that is embedded
 # in the the "<a href" data
 # 
+#
 # Returns an empty data frame if it cant process the results (see function
-# empty_receiverdetection_df()
+# empty_receiverdetection_df() (nrow=0, ncol=7)
 #
 ################################################################################
 

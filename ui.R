@@ -64,7 +64,7 @@ i18n$set_translation_language(default_UI_lang)  #set in global.R
 #      present in in the data/translation dir
 #
 df <- data.frame(
-  val = c("en","es")
+  val = c("en","es","fr")
   #val=setNames(active_ui_lang,active_ui_lang)
 )
 
@@ -72,7 +72,8 @@ df <- data.frame(
 ## - and note the css class is jhr
 df$img = c(
   "<img src='images/flags/ENUS.png' width=30px height=20px><div class='jhr'>English</div></img>",
-  "<img src='images/flags/MX.png' width=30px height=20px><div class='jhr'>Spanish</div></img>"
+  "<img src='images/flags/MX.png' width=30px height=20px><div class='jhr'>Spanish</div></img>",
+  "<img src='images/flags/FR.png' width=30px height=20px><div class='jhr'>French</div></img>"
 ) 
 
 
@@ -112,6 +113,7 @@ ui_navbar <-  div( class="navbar1",  style="font-family: Verdana font-style: nor
  #navbarPage("",id="inTabset",theme="custom-navbar.css", 
 
  navbarPage("",id="inTabset",theme="my-custom-theme.css", 
+           
             
             tabPanel(value="panel1", i18n$t("ui_nav_page_main"),style="color:#000000;font-style: normal;font-size: 12px;",
             ###tabPanel(value="panel1", i18n$t("ui_nav_page_main"),
@@ -141,33 +143,34 @@ ui_titlebar <- fluidRow(
       # NOTE: Offseting logo -30PX to recover vertical space.. value determined by trial and error
       div(style="display: inline-block;margin-top:-30px;",img(src = config.MainLogoFile, height = config.MainLogoHeight)),
       
-      span(style="color:#8FBC8F;font-style: italic;font-size: 25px;", 
-  
-           div(style="display: inline-block;vertical-align:middle; width: 50%;", textOutput("main_page_title")),
-          
-            #a utility action button on titlebar for debugging
-            # if you enable, also enable the observer function in server.R
-            #actionButton("btnCommand","Command"),
+      #span(style="color:#8FBC8F;font-style: italic;font-size: 25px;",
+      span(style=paste0("color:",config.TitlebarColor,";font-style: italic;font-size: 25px;"), 
+           
+           div(style="display:inline-block;vertical-align:middle; width: 50%;", textOutput("main_page_title")),
+           
+           #div(style=paste0("color:",config.TitlebarColor,"; display: inline-block;vertical-align:middle; width: 50%;"), textOutput("main_page_title")),
+           
+           #a utility action button on titlebar for debugging
+           # if you enable, also enable the observer function in server.R
+           #actionButton("btnCommand","Command"),
            
            
            div(style="display: inline-block;vertical-align:top;width:120px", pickerInput(inputId = "receiver_pick",
-                                              #label = "",
-                                              label = i18n$t("ui_mainpage_available_receivers"),
-                                              width = 170,
-                                              #choices = gblReceivers_df["Name"],
-                                              choices = config.ReceiverShortNames,
-                                              options = pickerOptions(container = "body")
-                                              )) ,
+                                   label = i18n$t("ui_mainpage_available_receivers"),
+                                   width = 170,
+                                   choices = config.ReceiverShortNames,
+                                   options = pickerOptions(container = "body")
+           )) ,
            
-            
+           
            span(
              tags$div(  tags$style(".jhr{
                        display: inline;
                        vertical-align: middle;
                        padding-left: 10px;
                         }")),
-  
-              pickerInput(inputId = "lang_pick",
+             
+             pickerInput(inputId = "lang_pick",
                          label = "",
                          width = 170,
                          choices = df$val,
@@ -175,7 +178,7 @@ ui_titlebar <- fluidRow(
                          options = pickerOptions(container = "body")
              ),
              
-
+             
              style = "position:absolute;right:2em;"
            ), #end span2
            
@@ -191,7 +194,9 @@ ui_titlebar <- fluidRow(
 ## assemble the UI from the pieces
 ###############################################################################
 ui <- fluidPage( 
-  tags$script(inactivity),    
+  tags$head(  tags$script(src="var_change.js")),
+  tags$script(inactivity),
+
   ui_titlebar,
   ui_navbar,
   

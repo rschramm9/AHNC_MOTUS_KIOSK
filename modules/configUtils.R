@@ -105,6 +105,34 @@ getConfig <- function() {
     config.HomepageSpanish<<- toString(list1[1])  
   }
   
+  #print("------------ HomepageFrench ----------------")
+  list1 <- keyValueToList(configtbl,'HomepageFrench')
+  if( is.null(list1) ){
+    # path is relative to the www/ directory
+    config.HomepageFrench<<-"www/docs/default_homepage_fr.html"
+  } else {
+    #I ultimately want a string
+    config.HomepageFrench<<- toString(list1[1])  
+  }
+  
+  #print("------------ NavbarColor ----------------")
+  list1 <- keyValueToList(configtbl,'NavbarColor')
+  if( is.null(list1) ){
+    config.NavbarColor<<-"#8FBC8F"  #ankeny green
+  } else {
+    #I ultimately want a string
+    config.NavbarColor<<- toString(list1[1])  
+  }
+  #print("------------ TitlebarColor ----------------")
+  list1 <- keyValueToList(configtbl,'TitlebarColor')
+  if( is.null(list1) ){
+    config.TitlebarColor<<-"#8FBC8F"  #ankeny green
+  } else {
+    #I ultimately want a string
+    config.TitlebarColor<<- toString(list1[1])  
+  }
+  
+  
   
   #print("------------ ReceiverDeploymentID --------------")
   # set global parms of both the list and the first item on the list
@@ -189,13 +217,23 @@ getConfig <- function() {
   }
   
   
-  #print("------------ CacheAgeLimitMinutes --------------")
-  list1 <- keyValueToList(configtbl,'CacheAgeLimitMinutes')
+  #print("------------ ActiveCacheAgeLimitMinutes --------------")
+  list1 <- keyValueToList(configtbl,'ActiveCacheAgeLimitMinutes')
   if( is.null(list1) ){
-    config.CacheAgeLimitMinutes<<-300 #5 minutes
+    config.ActiveCacheAgeLimitMinutes<<-300 #5 minutes
   } else {
-    config.CacheAgeLimitMinutes<<- as.numeric(list1[1]) #assume length=1
+    config.ActiveCacheAgeLimitMinutes<<- as.numeric(list1[1]) #assume length=1
   }
+  
+  
+  #print("------------ InactiveCacheAgeLimitMinutes --------------")
+  list1 <- keyValueToList(configtbl,'InactiveCacheAgeLimitMinutes')
+  if( is.null(list1) ){
+    config.InactiveCacheAgeLimitMinutes<<-20160
+  } else {
+    config.InactiveCacheAgeLimitMinutes<<- as.numeric(list1[1]) #assume length=1
+  }
+  
   
   #print("------------ HttpGetTimeoutSeconds --------------")
   list1 <- keyValueToList(configtbl,'HttpGetTimeoutSeconds')
@@ -260,6 +298,11 @@ printConfig <- function() {
   
   TSprint(paste0("HomepageSpanish:",config.HomepageSpanish))
   
+  TSprint(paste0("HomepageFrench:",config.HomepageFrench))
+  
+  TSprint(paste0("TilebarColor:",config.TitlebarColor))
+  TSprint(paste0("NavbarColor:",config.TitlebarColor))
+  
   if ( is.list( config.ReceiverDeployments)){
     for (i in 1:length(config.ReceiverDeployments)) {
       TSprint( paste0( "ReceiverDeployment[",i,"]:",config.ReceiverDeployments[[i]] ))
@@ -286,7 +329,9 @@ printConfig <- function() {
   
   TSprint(paste0(" EnableWriteCache:",config.EnableWriteCache))
   
-  TSprint(paste0("CacheAgeLimitMinutes:",config.CacheAgeLimitMinutes))
+  TSprint(paste0("ActiveCacheAgeLimitMinutes:",config.ActiveCacheAgeLimitMinutes))
+  
+  TSprint(paste0("InactiveCacheAgeLimitMinutes:",config.InactiveCacheAgeLimitMinutes))
   
   TSprint(paste0("CachePath:", config.CachePath))
   

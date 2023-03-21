@@ -218,9 +218,13 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
 
    #note <<- is assignment to global variable, also note receiverDeploymentID is global
    #detections_df <<- receiverDeploymentDetections(receiverDeploymentID)
-   detections_df <<- receiverDeploymentDetections(receiverDeploymentID, config.EnableReadCache, config.CacheAgeLimitMinutes)
+   detections_df <<- receiverDeploymentDetections(receiverDeploymentID, config.EnableReadCache, config.ActiveCacheAgeLimitMinutes)
+   if(nrow(detections_df)<=0) {  # failed to get results... try the inactive cache
+     DebugPrint("receiverDeploymentDetections request failed - try Inactive cache")
+     detections_df <<- receiverDeploymentDetections(receiverDeploymentID, config.EnableReadCache, config.InactiveCacheAgeLimitMinutes)
+   }
+   
    DebugPrint("back from receiverDeploymentDetection.. results follow ")
-   #str(detections_df)
    
    if( !is.data.frame(detections_df)){
      DebugPrint("receiverDeploymentDetections failed to return a dataframe... exit function")
@@ -340,44 +344,74 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
         
         if (is.na(tagDepID )) {
           DebugPrint("input$mytable_rows_selected observeEvent() - is.na tagDepID")
-            mydf <- data.frame( matrix( ncol = 9, nrow = 1) )
-            colnames(mydf) <- c('tagid', 'project', 'contact', 'started','species','lat','lon','ndays', 'nreceivers')
-            tagdetails_df <- mydf
+            ####mydf <- data.frame( matrix( ncol = 9, nrow = 1) )
+            ###colnames(mydf) <- c('tagid', 'project', 'contact', 'started','species','lat','lon','ndays', 'nreceivers')
+            ###tagdetails_df <- mydf
+            tagdetails_df <- empty_tagDeploymentDetails_df()
         } else {
-          DebugPrint(paste0("input$mytable_rows_selected observeEvent() - else calling tagDeploymentDetails w/tagDepID=",tagDepID))
-           #next get and render the tagDeploymentDetails (who tagged, where, when etc)
-           tagdetails_df <- tagDeploymentDetails(tagDepID, config.EnableReadCache, config.CacheAgeLimitMinutes)
-           DebugPrint("back from tagDeploymentDetails")
+            DebugPrint(paste0("input$mytable_rows_selected observeEvent() - else calling tagDeploymentDetails w/tagDepID=",tagDepID))
+            #next get and render the tagDeploymentDetails (who tagged, where, when etc)
+            tagdetails_df <- tagDeploymentDetails(tagDepID, config.EnableReadCache, config.ActiveCacheAgeLimitMinutes)
+            DebugPrint("back from tagDeploymentDetails")
+           
+            if(nrow(tagdetails_df)<=0) {  # failed to get results from active cache so try the inactive cache
+               DebugPrint("tagDeploymentDetails request failed - try Inactive cache")
+               tagdetails_df <- tagDeploymentDetails(tagDepID, config.EnableReadCache, config.InactiveCacheAgeLimitMinutes)
+            }
+            
+            if(nrow(tagdetails_df)<=0) {  # still failed to get results from via the inactive cache
+              DebugPrint("tagDeploymentDetails request from Inactive cache failed, set to empty df")
+              tagdetails_df <- empty_tagDeploymentDetails_df()
+            }
+            
         }
         
         DebugPrint("input$mytable_rows_selected observeEvent() - renderTable")
         output$tagdetail <- DT::renderDataTable(tagdetails_df,
-                                                selection = "single", 
-                                                options=list(dom = 'Bfrtip',
-                                                             searching = F
-                                                             ))
+                    selection = "single", 
+                    options=list(dom = 'Bfrtip',
+                    searching = F,
+                    language = list(zeroRecords = "No records to display - Motus.org possibly offline.")
+                    ) #end options
+                    ) #end renderDataTable()
+  
+        # trap for rare edge case for when motus.org is offline and the InactiveCache returns nothing 
+        if(nrow(tagdetails_df)<=0){
+          tagflight_df<-empty_tagDeploymentDetection_df()
+          output$flightpath <- DT::renderDataTable(tagflight_df,
+                        selection = "single", 
+                        options=list(dom = 'Bfrtip',
+                        searching = F,
+                        "pageLength" = 18,
+                        language = list(zeroRecords = "No records to display - Motus.org possibly offline.")
+                        ) #end options
+                        ) #end renderDataTable()
         
+           myLeafletMap = leaflet() %>% addTiles() #render the empty map
+           output$leaflet_map = renderLeaflet(myLeafletMap) 
+           DebugPrint("tagdetails_df nrows 0, just return after rendering empty map")
+           return()
+        }  
         
         DebugPrint("input$mytable_rows_selected observeEvent() - start on flight data")
         
         #if the tag deployment id is null there wont be any flight data, so just make an empty one
         if (is.na(tagDepID )) {
              DebugPrint("input$mytable_rows_selected observeEvent() - tagDepID is null so make dummy mydf")
-             mydf <- data.frame( matrix( ncol = 5, nrow = 1) )
-             colnames(mydf) <- c('date', 'site', 'lat', 'lon', 'receiverDeplymentID')
-             tagflight_df<-mydf
+             tagflight_df<-empty_tagDeploymentDetection_df()
        } else {
              #next get all of the detections associated with this tag deployment
              # note this is a local variable assignment
              DebugPrint(paste0("input$mytable_rows_selected observeEvent() - tagID NOT NA so call tagDeploymentDetections with tagDepID:",tagDepID))
-             #tagflight_df <- tagDeploymentDetections(tagDepID)
-             tagflight_df <- tagDeploymentDetections(tagDepID, config.EnableReadCache, config.CacheAgeLimitMinutes)
-             
-             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - back from tagDeploymentDetections()"))
-             
+  
+             tagflight_df <- tagDeploymentDetections(tagDepID, config.EnableReadCache, config.ActiveCacheAgeLimitMinutes)
+             if(nrow(tagflight_df)<=0) {  # failed to get results... try the inactive cache
+               DebugPrint("tagDeploymentDetections request failed - try Inactive cache")
+               tagflight_df <- tagDeploymentDetections(tagDepID, config.EnableReadCache, config.InactiveCacheAgeLimitMinutes)
+             }
              #add the tag deployment release point data to the flight path dataset
              #there has to be a better way but my R convert datetime to date skills arent up to it...
-             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - get release point"))
+             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - get release point from tag details"))
              releasepoint_df<-tagdetails_df[c("started","species","lat","lon")]
              my_date<-as_date(releasepoint_df$started)
              my_site<-"Tagged"
@@ -385,10 +419,13 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
              my_lon = releasepoint_df$lon
              my_receiverDeployment=0
              DebugPrint(paste0("input$mytable_rows_selected observeEvent() - add point to tagflight_df"))
-             tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon,my_receiverDeployment)
+        
+             if(nrow(tagflight_df)<=0){ #the empty df
+               tagflight_df[nrow(tagflight_df),] <- data.frame(my_date, my_site, my_lat, my_lon,my_receiverDeployment)
+             } else { #normal df
+               tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon,my_receiverDeployment)
+             }
 
-             
-             
              DebugPrint(paste0("input$mytable_rows_selected observeEvent() - sort tagflight_df"))
              #sort flight detection so most recent appears at bottom of the list
              tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
@@ -396,14 +433,15 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
        } #end if
 
         DebugPrint(paste0("input$mytable_rows_selected observeEvent() - render tagflight_df as table"))
-       # and render it
+
         output$flightpath <- DT::renderDataTable(tagflight_df,
-                                                 selection = "single", 
-                                                 options=list(dom = 'Bfrtip',
-                                                              searching = F,
-                                                              "pageLength" = 18
-                                                              ) #end options
-                                                 ) #end render()
+                                 selection = "single", 
+                                 options=list(dom = 'Bfrtip',
+                                 searching = F,
+                                "pageLength" = 18,
+                                language = list(zeroRecords = "No records to display - Motus.org possibly offline.")
+                                ) #end options
+        ) #end renderDataTable()
      
         #saveRDS(subset_df, file="subset.RDS")
         
