@@ -55,7 +55,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program source code when you obtained the software.
 
-Please read the included LICENSE file and/or see <http://www.gnu.org/licenses/>.
+Please read BOTH the included LICENSE file and LICENSE_ADDITIONAL_PERMISSIONS.  By downloading this software you are agreeing to be bound by all licensing terms as stated in these two documents.
+
 
 ### Hardware & Software Requirements
 
