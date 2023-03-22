@@ -44,7 +44,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.1.0  21-Mar-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.0  22-Mar-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -91,6 +91,7 @@ LOG_LEVEL = LOG_LEVEL_INFO #set an inital log level, after we read the config fi
 
 ###### read configuration key/value pairs
 library(data.table)
+
 
 # Add individual modules here
 source("modules/configUtils.R")
@@ -159,12 +160,12 @@ source("modules/receiverDeploymentDetails.R")
      # this hack isnt scalable but for now....
      tryCatch ( 
      {  
-         f <- paste0(getwd(),"/exclude_tag_detections",".csv")
+         f <- paste0(getwd(),"/data/exclude_tag_detections",".csv")
          if (file.exists(f)){
             gblExcludeTagDetections_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
             gblExcludeTagDetections_df[[1]] <- as.Date(gblExcludeTagDetections_df[[1]])
          } else { gblExcludeTagDetections_df= NULL }
-    
+
      },
      warning = function( w )
      {
@@ -188,7 +189,7 @@ source("modules/receiverDeploymentDetails.R")
      ###### work in progress... not filtering these yet.
      tryCatch ( 
        {  
-         f <- paste0(getwd(),"/exclude_tags",".csv")
+         f <- paste0(getwd(),"./data/exclude_tags",".csv")
          if (file.exists(f)){
            gblExcludeTag_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
            gblExcludeTag_df[[1]] <- as.Date(gblExcludeTag_df[[1]])

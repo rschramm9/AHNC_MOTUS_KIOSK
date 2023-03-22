@@ -1,14 +1,6 @@
 ui|en
 ui_nav_page_main|Home
-ui_nav_app_be|BE Sample size
-
 ui_nav_page_help|Help / Feedback
-
-ui_app_common_rcodepanel|Reproducible R code
-ui_app_common_envirpanel|Environment version
-
-
-ui_app_common_outpanel|Output
 
 ui_mainpage_lang|Select UI language
 ui_mainpage_available_receivers|Available Receivers
@@ -16,7 +8,7 @@ ui_mainpage_loading|Loading...
 
 ui_MotusNews_title|Motus News!
 ui_motusnews_loading|News loading
-ui_motusnews_unknown|www/news/stories/news_unknown_en.html
+ui_motusnews_unknown|www/newspages/stories/news_unknown_en.html
 
 ui_RCVR_title|Receiver Detections
 
@@ -44,4 +36,5 @@ ui_RCVR_pause_button_caption|Pause
 ui_RCVR_resume_button_caption|Resume
 
 species_ui_loading|Species page loading
-species_unknown|www/docs/species_unknown_en.html
+species_unknown|www/speciespages/species_unknown_en.html
+

@@ -1,6 +1,5 @@
 ui|fr
 ui_nav_page_main|Maison
-
 ui_nav_page_help|Aide / Commentaires
 
 ui_mainpage_lang|Sélectionnez la langue de l'interface utilisateur
@@ -9,7 +8,7 @@ ui_mainpage_loading|Chargement...
 
 ui_MotusNews_title|Nouvelles Motus!
 ui_motusnews_loading|Chargement des actualités
-ui_motusnews_unknown|www/news/stories/news_unknown_fr.html
+ui_motusnews_unknown|www/newspages/stories/news_unknown_fr.html
 
 ui_RCVR_title|Détections de récepteur
 
@@ -38,4 +37,4 @@ ui_RCVR_pause_button_caption|Pause
 ui_RCVR_resume_button_caption|reprendre
 
 species_ui_loading|Chargement de la page des espèces
-species_unknown|www/docs/species_unknown_fr.html
+species_unknown|www/speciespages/species_unknown_fr.html

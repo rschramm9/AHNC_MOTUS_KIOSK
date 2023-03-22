@@ -155,7 +155,22 @@ server <- function(input, output, session) {
              )
     ) #end insertUI
     
-  })  #end observeEvent
+    
+    
+    if(x=='en'){
+      titletext<-config.MainTitleEnglish  
+    } else if (x=='es'){ 
+      titletext<-config.MainTitleSpanish
+    } else if (x=='fr'){ 
+      titletext<-config.MainTitleFrench
+    } else {
+      titletext<-config.MainTitleEnglish 
+    }
+    output$main_page_title<-renderText({
+      dynamic_title <- input$receiver_pick
+      paste(titletext, dynamic_title)})
+    
+  })  #end observeEvent langpick
   
   
   # the receiver picker input reactive observer need to update
@@ -163,9 +178,21 @@ server <- function(input, output, session) {
   # note the SERVER_ReceiverDetections() also has an event observer for
   # this input, see ReceiverDetections.R
   observeEvent(input$receiver_pick, {
+    #choose the correct homepage given language selected on UI
+    x=input$lang_pick
+    if(x=='en'){
+      titletext<-config.MainTitleEnglish  
+    } else if (x=='es'){ 
+      titletext<-config.MainTitleSpanish
+    } else if (x=='fr'){ 
+      titletext<-config.MainTitleFrench
+    } else {
+      titletext<-config.MainTitleEnglish 
+    }
+    
     output$main_page_title<-renderText({
       dynamic_title <- input$receiver_pick
-      paste(config.MainTitle, dynamic_title)})
+      paste(titletext, dynamic_title)})
     
   })  #end observeEvent input$receiver_pick
   

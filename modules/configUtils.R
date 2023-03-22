@@ -64,14 +64,34 @@ getConfig <- function() {
     config.MainLogoFile<<- toString(list1[1])  
   }
 
-  #print("------------ MainTitle ----------------")
-  list1 <- keyValueToList(configtbl,'MainTitle')
+  #print("------------ MainTitleFrench ----------------")
+  list1 <- keyValueToList(configtbl,'MainTitleFrench')
   if( is.null(list1) ){
     badCfg<-TRUE 
-    config.MainTitle<<-NULL
+    config.MainTitleFrench<<-NULL
   } else {
     #I ultimately want a string
-    config.MainTitle<<- toString(list1[1])  
+    config.MainTitleFrench<<- toString(list1[1])  
+  }
+  
+  #print("------------ MainTitleEnglish ----------------")
+  list1 <- keyValueToList(configtbl,'MainTitleEnglish')
+  if( is.null(list1) ){
+    badCfg<-TRUE 
+    config.MainTitleEnglish<<-NULL
+  } else {
+    #I ultimately want a string
+    config.MainTitleEnglish<<- toString(list1[1])  
+  }
+  
+  #print("------------ MainTitleSpanish ----------------")
+  list1 <- keyValueToList(configtbl,'MainTitleSpanish')
+  if( is.null(list1) ){
+    badCfg<-TRUE 
+    config.MainTitleSpanish<<-NULL
+  } else {
+    #I ultimately want a string
+    config.MainTitleSpanish<<- toString(list1[1])  
   }
   
   #print("------------ MainLogoHeight --------------")
@@ -290,7 +310,9 @@ printConfig <- function() {
   
   TSprint(paste0("MainLogoFile:", config.MainLogoFile))
   
-  TSprint(paste0("MainTitle:",config.MainTitle))
+  TSprint(paste0("MainTitleEnglish:",config.MainTitleEnglish))
+  TSprint(paste0("MainTitleSpanish:",config.MainTitleSpanish))
+  TSprint(paste0("MainTitleFrench:",config.MainTitleFrench))
   
   TSprint(paste0("MainLogoHeight:",config.MainLogoHeight))
   

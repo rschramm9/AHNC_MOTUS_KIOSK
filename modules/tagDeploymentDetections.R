@@ -262,7 +262,6 @@ for (node in a_nodes) {
 #print(receiverDeploymentID)
 
 df <-data.frame(date,site,lat,lon,receiverDeploymentID)
-
 # flight data exclusions from .csv file read by global.R
 if( length(gblExcludeTagDetections_df > 0 )){
   for(i in 1:nrow(gblExcludeTagDetections_df)) {
@@ -270,7 +269,7 @@ if( length(gblExcludeTagDetections_df > 0 )){
       theDate=row[[1]]
       theID=row[[2]]
       theSite=row[[3]]
-      ##print(paste0("exclude"," date:",theDate, "  id:", theID,"  site:", theSite))
+      ###print(paste0("exclude"," date:",theDate, "  id:", theID,"  site:", theSite))
       df <- df[!(df$receiverDeploymentID == theID & df$date == theDate),] 
    }
 }

@@ -112,7 +112,7 @@ ui_mainpage <- fluidPage(
 ui_navbar <-  div( class="navbar1",  style="font-family: Verdana font-style: normal;font-size: 20px;",
  #navbarPage("",id="inTabset",theme="custom-navbar.css", 
 
- navbarPage("",id="inTabset",theme="my-custom-theme.css", 
+ navbarPage("",id="inTabset",theme="css/my-custom-theme.css", 
            
             
             tabPanel(value="panel1", i18n$t("ui_nav_page_main"),style="color:#000000;font-style: normal;font-size: 12px;",

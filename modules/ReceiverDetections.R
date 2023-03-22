@@ -117,7 +117,7 @@ UI_ReceiverDetections <- function(id, i18n) {
                                    leafletOutput(ns("leaflet_map"), width = "100%", height="100%")
                           ),
                           
-                          # TODO: enable this for a future spcies tab
+                          # enable this for the species tab
                          tabPanel( i18n$t("ui_RCVR_detections_species_tab_label"), 
                                     # helpText(i18n$t("ui_RCVR_detections_species_tab_helptext")),
                                     htmlOutput(ns("species"))
@@ -192,7 +192,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
     #about the currently selected bird 
     updateSpeciesInfo <- function() {    
     DebugPrint("update species")
-    #file like "/Users/rich/Projects/AHNC_MOTUS_KIOSK/www/docs/species_unknown_en.html") 
+    #file like "/Users/rich/Projects/AHNC_MOTUS_KIOSK/www/speciespages/species_unknown_en.html") 
 
     #get the default 'species_unknown' html filename matching the current language    
     xxx <- i18n_r()$t("species_unknown")  
@@ -205,7 +205,6 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
     } else {
       zzz <- includeHTML(xxx)
     }
-    
     output$species <- renderUI(zzz)
    } #end updateSpeciesInfo()
     
