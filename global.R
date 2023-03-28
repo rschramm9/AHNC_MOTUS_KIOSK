@@ -44,7 +44,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.0  22-Mar-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.1  22-Mar-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -208,36 +208,6 @@ source("modules/receiverDeploymentDetails.R")
          gblExcludeTag_df= NULL
        } )
       #print(gblExcludeTag_df)
-    
-     ##################################################
-     # enable this code block to run to completely rebuild cache
-     ##################################################
-     if (1==2){ #rebuild cache
-       for (i in 1:nrow(gblReceivers_df)) {
-         row <- gblReceivers_df[i,]
-         site=row[[1]]
-         id=row[["receiverDeploymentID"]]
-         print(paste0("look for id:", id,"  site:", site))
-         
-         receiverDetails_df = receiverDeploymentDetails(id,useReadCache=0) #dont care about cache age
-         
-         data = receiverDeploymentDetections(id,useReadCache=0)
-         unique_df <- data[!duplicated(data$tagDeploymentID), ] # Extract unique rows
-         for(j in 1:nrow(unique_df)){
-           row <- unique_df[j,]
-           tagdepid=row[["tagDeploymentID"]]
-           print(paste0("look for details for tagid:",tagdepid))
-           tagDetails_df = tagDeploymentDetails(tagdepid,useReadCache=0)
-           print(paste0("look for detections for tagid:",tagdepid))
-           tagflight_df <- tagDeploymentDetections(tagdepid, useReadCache=0)
-         }
-       }
-     }
-     
-     
-     
-     
-     
     
      ## javascript idleTimer to reset gui when its been inactive 
      ## see also server.R  observeEvent(input$timeOut)
