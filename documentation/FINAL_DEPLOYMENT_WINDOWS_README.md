@@ -59,6 +59,7 @@ When open kiosk runs it may appear to lock you out of viewing other windows (inc
 Download and install OpenKiosk from https://openkiosk.mozdevgroup.com/
 
 *It’s a long download* that ends up in your downloads folder – something like OpenKiosk91.7.0-2022-02-22-x86_64.exe
+**28March2023 - now downloads a .msi installer file to your Downloads folder (not a .exe)** 
 
 Double-click the installer. Windows may show “Windows protected your PC”,  just click “More info” and select “Run anyway”
 
@@ -137,14 +138,14 @@ File 2 - MOTUS_MSWINDOWS_STARTSERVER_TASK.xml is used to create the task schedul
 
  2.5.2 - Open Chrome or Firefox and browse to:  http:://localhost:8081 - the kiosk app should be displayed in the browser.
 
-**2.6** - Test that the job starts ton boot
+**2.6** - Test that the job starts on boot
 
  2.6.1 - shutdown and reboot the PC.
  2.6.2 - retest by pointing your web browser again to localhost:8081
 
-**Warning** On a slow PC, sometimes it takes a few momenst for the server to fully start.  Your browser may say it failed to connect, wait perhaps 5-10 seconds and retry.)
+**Warning** On a slow PC, sometimes it takes a few momentd for the server to fully start.  Your browser may say it failed to connect, wait perhaps 5-10 seconds and retry.)
 
-**2.7** - At this point you hopefully have a kiosk server that auto-starts whenever the PC is booted.
+**2.7** - At this point you should have a kiosk server )that auto-starts whenever the PC is booted (but not the dashboard window yet...that comes next)wmic
 
 **TROUBLE SHOOTING:** If the browser doesnt display the dashboard.
 
