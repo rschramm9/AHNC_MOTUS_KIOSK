@@ -19,6 +19,8 @@ library(tidyr) #for  web scraping
 
 ### read URLs with timeouts
 library(httr)
+###### read configuration key/value pairs
+library(data.table)
 
 # Add individual modules here
 source("modules/configUtils.R")
