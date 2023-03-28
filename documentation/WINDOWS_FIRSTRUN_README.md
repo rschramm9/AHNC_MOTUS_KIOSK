@@ -226,7 +226,7 @@ Eventually it will pop-up the “Choose privacy settings” page. Deselect all o
 
  **14.4** **Verify >>** since MOTUS_KIOSK was last logged in user and has no password, it should auto-login on reboot. If not, select MOTUS_KIOSK as user and click ‘Sign In’ button to log in manually. Then repeat the reboot and auto-login sequence
 
-**14.5** stay logged in as MOTUS_KIOSK.  Let the computer sit idle for whatever your screensaver timeout has been set to.  **Verify**>> Screensaver fires correctly and when you return to move the mouse you are fully logged in (NO lock screen to go through)
+**14.5**  ***IF you have a screensaver enabled***... (not recommended for kiosk mode):  stay logged in as MOTUS_KIOSK. Let the computer sit idle for whatever your screensaver timeout has been set to. **Verify**>> Screensaver fires correctly and when you return to move the mouse you are fully logged in (NO lock screen to go through)
 
 ####  Main 15.0 -  Perform cleanup for User=MOTUS_KIOSK all as before 
 
