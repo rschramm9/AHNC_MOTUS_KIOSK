@@ -150,7 +150,7 @@ ui_titlebar <- fluidRow(
            
            #div(style=paste0("color:",config.TitlebarColor,"; display: inline-block;vertical-align:middle; width: 50%;"), textOutput("main_page_title")),
            
-           #a utility action button on titlebar for debugging
+           # a utility action button on titlebar for debugging
            # if you enable, also enable the observer function in server.R
            #actionButton("btnCommand","Command"),
            
@@ -218,8 +218,8 @@ ui <- fluidPage(
                         display: inline-block;
                         ') ,
   
-     textOutput("motusState")%>% 
-     tagAppendAttributes(style= 'font-size: 10px;
+     htmlOutput("motusState")%>% 
+     tagAppendAttributes(style= 'font-size: 12px;
                         padding: 1px;
                         margin-bottom: 1px;
                         margin-top: 1px;
