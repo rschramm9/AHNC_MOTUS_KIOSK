@@ -46,11 +46,8 @@ server <- function(input, output, session) {
   # Load translations
   # setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
   
-  
-
   session$sendCustomMessage("color_change",config.NavbarColor)
-  
-  
+
   #suppress translator warning re. 'no translation yaml file' 
   warn = getOption("warn")
   options(warn=-1)
@@ -65,28 +62,28 @@ server <- function(input, output, session) {
   #result<-receiverDeploymentDetails(defaultReceiverID, useReadCache=0) 
   #this creates and sets a global variable 'motus' to be a reactive value so
   #it can be observed
-  motusServer<<-reactiveValues(status=FALSE,msg="MotusStatus:Unknown")
-  # this binds the observer (an output) to the reactive value
-  #output$motusState<-renderText({motusServer$status})
+
+  motusServer<<-reactiveValues(status=FALSE,
+               msg=paste("<span style=\"background-color:#fffb00\">MotusStatus:Unknown</span>"))
+
+  # this binds the observer (an output widget) to the reactive value
   output$motusState<-renderText({motusServer$msg})
+
   ##############################################################
   #reactive timer to go test Motus periodically to see if online
   #autoInvalidate <- reactiveTimer(numCheckMotusUpIntervalSeconds) #60 seconds
   millisecs <- config.CheckMotusIntervalMinutes*60*1000 #milliseconds #see config file settings
   autoInvalidate <- reactiveTimer(millisecs)
   
-  
   # render the versioning text string set in global.R to the
   # main page footer output
   output$footer<-renderText({gblFooterText})
   
-# this button is for debugging the motusServer$state reactive variable
+# this button is for debugging 
 #if you enable the observer here, also enable it in the ui.R
-  observeEvent(input$btnCommand, { 
-    InfoPrint("Button pressed.")
-    session$sendCustomMessage("color_change", "#8FBC8F")
-
-  })
+#  observeEvent(input$btnCommand, { 
+#    WarningPrint("Button pressed.")
+#  })
   
   
   #watch for timer to fire, reset it  and then go check on motus
@@ -107,14 +104,20 @@ server <- function(input, output, session) {
     InfoPrint(paste0("Back from html call - Elapsed time:",elapsedtime," secs"))
     
     if(nrow(result) > 0){
-      if( motusServer$status == FALSE){  WarningPrint("Motus now online") }
-      motusServer$msg<<-"MotusStatus:Online"
-      motusServer$status<<-TRUE 
-    } else{ #is the empty_df
-      if( motusServer$status == TRUE){ WarningPrint("Motus went offline")}
-      motusServer$msg<<-"MotusStatus:Offline"
-      motusServer$status<<-FALSE
+        if( motusServer$status == FALSE){ 
+           WarningPrint("Motus status changed to online.")
+           motusServer$status<<-TRUE 
+           motusServer$msg<<-paste("<span style=\"background-color:#8aff0c\">MotusStatus:Online</span>")
+        }
+     
+    } else { #is the empty_df
+        if( motusServer$status == TRUE){
+           WarningPrint("Motus status changed to offline due (no response timeout).")
+           motusServer$status<<-FALSE
+           motusServer$msg<<-paste("<span style=\"background-color:#fffb00\">MotusStatus:Offline</span>")
+        }
     }
+
     
   })
   
