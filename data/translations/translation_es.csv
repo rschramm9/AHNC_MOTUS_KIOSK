@@ -11,6 +11,10 @@ ui_MotusNews_title|Noticias Motus!
 ui_motusnews_loading|Noticias cargando
 ui_motusnews_unknown|www/newspages/stories/news_unknown_es.html
 
+ui_AboutMotus_title|Más información sobre Motus
+ui_about_motus_loading|Acerca de la carga de Motus
+ui_about_motus_default|aboutmotuspages/MOTUS_infographic_final_es.png
+
 ui_RCVR_title|Detecciones del receptor
 
 ui_RCVR_detections_details_tab_label|Detalles

@@ -206,5 +206,6 @@ server <- function(input, output, session) {
   # event in SERVER_ReceiverDetection also
  SERVER_ReceiverDetections("ReceiverDetections"  ,i18n_r = reactive(i18n), lang = reactive(input$lang_pick), rcvr= reactive(input$receiver_pick))
  SERVER_MotusNews("MotusNews",i18n_r = reactive(i18n), lang = reactive(input$lang_pick), rcvr= reactive(input$receiver_pick))
+ SERVER_AboutMotus("AboutMotus",i18n_r = reactive(i18n), lang = reactive(input$lang_pick))
  }
 

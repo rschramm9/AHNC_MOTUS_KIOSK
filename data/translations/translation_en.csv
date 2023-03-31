@@ -10,6 +10,10 @@ ui_MotusNews_title|Motus News!
 ui_motusnews_loading|News loading
 ui_motusnews_unknown|www/newspages/stories/news_unknown_en.html
 
+ui_AboutMotus_title|Learn More About Motus
+ui_about_motus_loading|About Motus loading
+ui_about_motus_default|aboutmotuspages/MOTUS_infographic_final_en.png
+
 ui_RCVR_title|Receiver Detections
 
 ui_RCVR_detections_details_tab_label|Tag Detail

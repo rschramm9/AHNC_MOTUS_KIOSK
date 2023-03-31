@@ -72,8 +72,8 @@ df <- data.frame(
 ## - and note the css class is jhr
 df$img = c(
   "<img src='images/flags/ENUS.png' width=30px height=20px><div class='jhr'>English</div></img>",
-  "<img src='images/flags/MX.png' width=30px height=20px><div class='jhr'>Spanish</div></img>",
-  "<img src='images/flags/FR.png' width=30px height=20px><div class='jhr'>French</div></img>"
+  "<img src='images/flags/ES.png' width=30px height=20px><div class='jhr'>Español</div></img>",
+  "<img src='images/flags/FR.png' width=30px height=20px><div class='jhr'>Français</div></img>"
 ) 
 
 
@@ -127,7 +127,11 @@ ui_navbar <-  div( class="navbar1",  style="font-family: Verdana font-style: nor
                  tabPanel(value="panel3", i18n$t("ui_MotusNews_title"),style="color:#000000;font-style: normal;font-size: 10px;",
                           UI_MotusNews("MotusNews", i18n=i18n),
                  ),
-                 
+            
+            tabPanel(value="panel4", i18n$t("ui_AboutMotus_title"),style="color:#000000;font-style: normal;font-size: 10px;",
+                     UI_AboutMotus("AboutMotus", i18n=i18n),
+            ),
+            
 
       ),
 ) #end the ui_navbar definition

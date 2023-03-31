@@ -10,6 +10,10 @@ ui_MotusNews_title|Nouvelles Motus!
 ui_motusnews_loading|Chargement des actualités
 ui_motusnews_unknown|www/newspages/stories/news_unknown_fr.html
 
+ui_AboutMotus_title|En savoir plus sur Motus
+ui_about_motus_loading|À propos du chargement Motus
+ui_about_motus_default|aboutmotuspages/MOTUS_infographic_final_fr.png
+
 ui_RCVR_title|Détections de récepteur
 
 ui_RCVR_detections_details_tab_label|Détails de la balise
