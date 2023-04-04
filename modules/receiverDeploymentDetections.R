@@ -162,15 +162,26 @@ receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, c
   # now extract the data table
   tbls <- page %>% html_nodes("table")
   
+  #message(paste("class tbls:", class(tbls)))
+  #str(tbls)
+  
+  len=length(tbls)
+  #message(paste("length of list:", len))
+    
+  if (len <= 0) {
+      WarningPrint("returning empty df (empty detections table found in results for this receiver)")
+      return(onError_df)
+  }
+  
   tbl1 <- html_table(tbls[[1]],fill=TRUE)
   num.cols<-dim(tbl1)[2]
   num.rows<-dim(tbl1)[1]
-#  print ("dim(tbl1):")
-#  print(dim(tbl1))
-#  print("numrows:")
-#  print(num.rows)
-#  print ("numcols:")
-#  print(num.cols)
+  print ("dim(tbl1):")
+  print(dim(tbl1))
+  print("numrows:")
+  print(num.rows)
+  print ("numcols:")
+  print(num.cols)
 #  for(i in 1:num.rows){
 #    print(paste0("------------ for row i:",i," --------------"))
 #    print( tbl1[[1]][i] ) 
