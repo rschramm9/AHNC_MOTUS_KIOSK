@@ -148,7 +148,7 @@ server <- function(input, output, session) {
       thepage<-config.HomepageEnglish 
     }
     
-    # Refresh readme file on the main home page tab of the navbar
+    # Refresh homepage file on the main home page tab of the navbar
     removeUI(selector ="#readmediv", immediate = TRUE)
     insertUI(immediate = TRUE,
              selector = '#readmehere', session=session,
@@ -156,8 +156,15 @@ server <- function(input, output, session) {
                 #includeHTML( as.character(i18n$get_translations()["ui_mainpage_readmefile",input$lang_pick]) )
                 includeHTML( as.character(thepage) )
              )
-    ) #end insertUI
+    )
     
+    
+    # need to make sure the aboutMotus image gets set to correct language
+    # even if its tab is not currently selected (exposed)
+    xxx <- as.character(i18n$get_translations()["ui_about_motus_default",input$lang_pick])
+    output$about_motus <- renderUI({
+      img(src=xxx, height='95%')
+    })
     
     
     if(x=='en'){
