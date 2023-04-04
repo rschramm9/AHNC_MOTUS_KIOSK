@@ -44,7 +44,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.3  03-Apr-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.4  04-Apr-2023"
 ############### will be rendered into footer by server() ########## 
 
 
