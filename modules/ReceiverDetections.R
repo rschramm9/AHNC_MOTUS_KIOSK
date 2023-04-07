@@ -232,7 +232,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
    
    
    DebugPrint("sort the detections")
-   #sort detections so most recent appears at top of list notice we are woking with a global variable ( <<- )
+   #sort detections so most recent appears at top of list notice we are working with a global variable ( <<- )
    detections_df <<- detections_df[ order(detections_df$tagDetectionDate,decreasing = TRUE), ]
    DebugPrint("back sort.. results follow ")
    #str(detections_df)

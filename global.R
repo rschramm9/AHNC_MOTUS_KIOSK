@@ -44,7 +44,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.4  04-Apr-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.5  07-Apr-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -127,6 +127,32 @@ source("modules/AboutMotus.R")
        "LOG_LEVEL_NONE"=LOG_LEVEL_NONE,
      )
      
+     
+     # read a csv file for any bad or test tags we want the gui to
+     # ignore. any receiver detection of a tag with matching TagDeploymentID
+     # would have all detections of this tag at the receiver ignored
+     # eg for a 'test tag' used a site where we dont want to show the public user
+     # our test data
+     tryCatch ( 
+       {  
+         f <- paste0(getwd(),"/data/ignore_tags",".csv")
+         if (file.exists(f)){
+           gblIgnoreTag_df <<- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
+         } else { gblIgnoreTag_df= NULL }
+       },
+       warning = function( w )
+       {
+         WarningPrint("") # dummy warning function to suppress the output of warnings
+         gblIgnoreTag_df= NULL
+       },
+       error = function( err )
+       {
+         ErrorPrint("exclude_tags.csv read error")
+         ErrorPrint("here is the err returned by the read:")
+         TErrorPrint(err)
+         gblIgnoreTag_df= NULL
+       } )
+
      # construct data frame to support the available receivers picklist
      # the shortnames list contains the visible choices on the dropdown
      # here we make a dataframe from the shortnames and the deployment ids, later we
@@ -181,35 +207,6 @@ source("modules/AboutMotus.R")
        gblExcludeTagDetections_df= NULL
      } )
 
-     
-     # read a csv file for any known bad tags that we want the gui to
-     # ignore any detection of a tag with this id
-     # this would mean all detections of this tag at any receiver - eg for 
-     # for a 'test tag' used a site
-     # this hack isnt scalable but for now....
-     ###### work in progress... not filtering these yet.
-     tryCatch ( 
-       {  
-         f <- paste0(getwd(),"./data/exclude_tags",".csv")
-         if (file.exists(f)){
-           gblExcludeTag_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
-           gblExcludeTag_df[[1]] <- as.Date(gblExcludeTag_df[[1]])
-         } else { gblExcludeTag_df= NULL }
-       },
-       warning = function( w )
-       {
-         WarningPrint("") # dummy warning function to suppress the output of warnings
-         gblExcludeTag_df= NULL
-       },
-       error = function( err )
-       {
-         ErrorPrint("exclude_tags.csv read error")
-         ErrorPrint("here is the err returned by the read:")
-         TErrorPrint(err)
-         gblExcludeTag_df= NULL
-       } )
-      #print(gblExcludeTag_df)
-    
      ## javascript idleTimer to reset gui when its been inactive 
      ## see also server.R  observeEvent(input$timeOut)
      #numInactivityTimeoutSecond <- 30 #seconds

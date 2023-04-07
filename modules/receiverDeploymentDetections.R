@@ -176,12 +176,12 @@ receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, c
   tbl1 <- html_table(tbls[[1]],fill=TRUE)
   num.cols<-dim(tbl1)[2]
   num.rows<-dim(tbl1)[1]
-  print ("dim(tbl1):")
-  print(dim(tbl1))
-  print("numrows:")
-  print(num.rows)
-  print ("numcols:")
-  print(num.cols)
+  #print ("dim(tbl1):")
+  #print(dim(tbl1))
+  #print("numrows:")
+  #print(num.rows)
+  #print ("numcols:")
+  #print(num.cols)
 #  for(i in 1:num.rows){
 #    print(paste0("------------ for row i:",i," --------------"))
 #    print( tbl1[[1]][i] ) 
@@ -271,10 +271,22 @@ receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, c
   #print(tagDeploymentID)
   #---------------------------------------------------------- 
   
-  
+  # build the final dataframe
   df <-data.frame(tagDetectionDate,tagDeploymentID,tagDeploymentName,species,tagDeploymentDate,lat,lon)
   #colnames(df) <- c('tagDetectionDate','tagDeploymentID','tagDeploymentName','species','tagDeploymentDate','lat','lon')
   
+  # Next we filter out any  tags to be ignored from .csv file read by global.R
+  if( length(gblIgnoreTag_df > 0 )){
+    for(i in 1:nrow(gblIgnoreTag_df)) {
+      row <- gblIgnoreTag_df[i,]
+      rID=row[[1]]
+      tID=row[[2]]
+      if(rID == receiverDeploymentID ){ 
+        df <- df[!(df$tagDeploymentID == tID),]
+      }
+    }
+  }
+ 
   #delete nulls
   df <- df %>% drop_na()
   #print(df)
@@ -283,6 +295,7 @@ receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, c
     DebugPrint("receiverDeploymentDetections writing new cache file.")
      saveRDS(df,file=cacheFilename)
   }
+ 
   DebugPrint("receiverDeploymentDetections done.")
   return(df)
   
