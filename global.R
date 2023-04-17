@@ -44,7 +44,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.5  07-Apr-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.6  17-Apr-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -128,30 +128,29 @@ source("modules/AboutMotus.R")
      )
      
      
-     # read a csv file for any bad or test tags we want the gui to
-     # ignore. any receiver detection of a tag with matching TagDeploymentID
+     # read a csv file for any bad or tags by tagID we want the gui to
+     # ignore. any receiver detection of a tag with matching TagID
      # would have all detections of this tag at the receiver ignored
      # eg for a 'test tag' used a site where we dont want to show the public user
      # our test data
-     tryCatch ( 
-       {  
-         f <- paste0(getwd(),"/data/ignore_tags",".csv")
-         if (file.exists(f)){
-           gblIgnoreTag_df <<- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
-         } else { gblIgnoreTag_df= NULL }
-       },
-       warning = function( w )
-       {
-         WarningPrint("") # dummy warning function to suppress the output of warnings
-         gblIgnoreTag_df= NULL
-       },
-       error = function( err )
-       {
-         ErrorPrint("exclude_tags.csv read error")
-         ErrorPrint("here is the err returned by the read:")
-         TErrorPrint(err)
-         gblIgnoreTag_df= NULL
-       } )
+     f <- paste0(getwd(),"/data/ignore_tags",".csv") 
+     gblIgnoreTag_df <<- ReadCsvToDataframe(f)
+    
+     # read a csv file for any bad or tags by tagDeploymentID we want the gui to
+     # ignore. any receiver detection of a tag with matching tagDeploymentID
+     # would have all detections of this tag at the receiver ignored
+     # eg for a 'test tag' that may be redeployed later on an animal
+     # where we dont want to show the public user the test data
+     f <- paste0(getwd(),"/data/ignore_tag_deployments",".csv")
+     gblIgnoreTagDeployment_df <<- ReadCsvToDataframe(f)
+     
+     # read a csv file for any known bad tag detections at some receiver that we want the gui to ignore
+     # these are individual detections of a tag at some receiver - eg wild point where the animal 
+     # flies across the continent in a day = a false detections that motus hasnt filtered
+     # this hack isnt scalable but for now....
+     f <- paste0(getwd(),"/data/ignore_date_tag_receiver_detections",".csv")
+     gblIgnoreDateTagReceiverDetections_df <<- ReadCsvToDataframe(f)
+
 
      # construct data frame to support the available receivers picklist
      # the shortnames list contains the visible choices on the dropdown
@@ -181,31 +180,7 @@ source("modules/AboutMotus.R")
 
      detections_subset_df<<-detections_df[c("tagDetectionDate", "tagDeploymentID","species" )]
 
-     # read a csv file for any known bad tag detections that we want the gui to ignore
-     # these are individual detections of a tag at some receiver - eg wild point 
-     # false detections
-     # this hack isnt scalable but for now....
-     tryCatch ( 
-     {  
-         f <- paste0(getwd(),"/data/exclude_tag_detections",".csv")
-         if (file.exists(f)){
-            gblExcludeTagDetections_df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
-            gblExcludeTagDetections_df[[1]] <- as.Date(gblExcludeTagDetections_df[[1]])
-         } else { gblExcludeTagDetections_df= NULL }
-
-     },
-     warning = function( w )
-     {
-         WarningPrint("") # dummy warning function to suppress the output of warnings
-         gblExcludeTagDetections_df= NULL
-     },
-     error = function( err )
-     {
-       ErrorPrint("exclude_tag_detections.csv read error")
-       ErrorPrint("here is the err returned by the read:")
-       ErrorPrint(err)
-       gblExcludeTagDetections_df= NULL
-     } )
+   
 
      ## javascript idleTimer to reset gui when its been inactive 
      ## see also server.R  observeEvent(input$timeOut)

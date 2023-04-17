@@ -63,8 +63,8 @@ library(httr)
 ################################################################################
 empty_receiverDeploymentDetection_df <- function()
 {
-  df <- data.frame( matrix( ncol = 7, nrow = 1 ) )
-  colnames(df) <- c('tagDetectionDate','tagDeploymentID','tagDeploymentName','species','tagDeploymentDate','lat','lon')
+  df <- data.frame( matrix( ncol = 8, nrow = 1 ) )
+  colnames(df) <- c('tagDetectionDate','tagID','tagDeploymentID','tagDeploymentName','species','tagDeploymentDate','lat','lon')
   df <- df %>% drop_na()
   return (df)
 }
@@ -201,6 +201,7 @@ receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, c
   lat<-c()
   lon<-c()
   tagDeploymentID<-c()
+  tagID<-c()
   
  
   #[1] "character"
@@ -229,7 +230,15 @@ receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, c
     tagDeploymentDate <-c( tagDeploymentDate, tbl1[[4]][i] )
     lat <-  c( lat,  tbl1[[5]][i]  )
     lon <-  c( lon,  tbl1[[6]][i] )
-    ###cat("n:",n," length:", length(tagDetectionDate), "Date:", tbl1[[1]][i] ,"\n")
+    
+    #extract tagID that appears at the very end of the tagDeploymentName
+    #see: https://stackoverflow.com/questions/70665269/extract-numbers-that-appear-last-in-the-string
+    s1<-tbl1[[2]][i]
+    s2<-stringr::str_extract(s1, stringr::regex("(\\d+)(?!.*\\d)"))
+    tid<-as.numeric(s2)
+    
+    #print(paste0("NameString:",s1, "   TagID:",tid))
+    tagID <- c(tagID, tid)  #add tagID to vector
   }
   
   #convert things that are not meant to be strings to correct type
@@ -257,8 +266,6 @@ receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, c
   # and append it to the list...
   n <- 0
   for (node in a_nodes) {
-    #print(node)
-    #print(class(node))
     ans <- str_detect( toString(node), "tagDeployment" )
     if(ans) {
       n <- n+1
@@ -272,22 +279,40 @@ receiverDeploymentDetections <- function(receiverDeploymentID, useReadCache=1, c
   #---------------------------------------------------------- 
   
   # build the final dataframe
-  df <-data.frame(tagDetectionDate,tagDeploymentID,tagDeploymentName,species,tagDeploymentDate,lat,lon)
+  df <-data.frame(tagDetectionDate, tagID, tagDeploymentID,tagDeploymentName,species,tagDeploymentDate,lat,lon)
   #colnames(df) <- c('tagDetectionDate','tagDeploymentID','tagDeploymentName','species','tagDeploymentDate','lat','lon')
   
-  # Next we filter out any  tags to be ignored from .csv file read by global.R
+  
+  #
+  # First filter we filter out any tags to be ignored from IgnoreTagDeployment file read by global.R
+  #
+  if( length(gblIgnoreTagDeployment_df > 0 )){
+    for(i in 1:nrow(gblIgnoreTagDeployment_df)) {
+      row <- gblIgnoreTagDeployment_df[i,]
+      rID=row[[1]]
+      tID=row[[2]]
+      if(rID == receiverDeploymentID ){ 
+      df <- df[!(df$tagDeploymentID == tID),]
+      }
+    }
+  }
+  
+  #
+  # Second, from remainder we filter out any tags 
+  # to be ignored from ignore_tags.csv file read by global.R
+  # ie all tagDeployments of tag with tagID if seen by this receiver
   if( length(gblIgnoreTag_df > 0 )){
     for(i in 1:nrow(gblIgnoreTag_df)) {
       row <- gblIgnoreTag_df[i,]
       rID=row[[1]]
       tID=row[[2]]
       if(rID == receiverDeploymentID ){ 
-        df <- df[!(df$tagDeploymentID == tID),]
+        df <- df[!(df$tagID == tID),]
       }
     }
   }
- 
-  #delete nulls
+
+  #delete records with nulls
   df <- df %>% drop_na()
   #print(df)
   

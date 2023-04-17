@@ -1,4 +1,38 @@
 ################################################################################
+# 
+################################################################################
+ReadCsvToDataframe <-function(f){
+
+  # read a csv file if exists... any error returns NA
+  tryCatch ( 
+    {  
+      if (file.exists(f)){
+        df <- read.table(file=f, sep = ",", as.is = TRUE, header=TRUE)
+      } else { 
+        df <- NULL }
+    },
+    warning = function( w )
+    {
+      WarningPrint("") # dummy warning function to suppress the output of warnings
+     df <- NULL
+    },
+    error = function( err )
+    {
+      ErrorPrint("ReadCsvToDataframe read error")
+      ErrorPrint( paste(" reading file:",f))
+      ErrorPrint(" here is the err returned by the read:")
+      TErrorPrint(err)
+      df<- NULL
+    } )
+    
+  return(df)
+}
+
+
+
+
+
+################################################################################
 # given HTML page and a target string 'title'
 # will return TRUE if any html title node title string contains target
 # else return FALSE if not found or no match
