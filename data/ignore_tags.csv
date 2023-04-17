@@ -1,2 +1,3 @@
-receiverDeploymentID, tagDeploymentID, breif_note
-9559, 43628, 'Receiver Corvallis_01 , a tagged robin from Ankeny Hill'
+receiverDeploymentID, tagID, brief_note
+9195, 71096, 'ABC Test CTT tag tagID for 782D6655'
+9195, 71092, 'ABC Test CTT tag tagID for 33525542'
