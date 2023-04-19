@@ -50,3 +50,5 @@ kiosk.cfg
 #the Logs directory
 Logs/*.txt
 
+changes.txt
+

@@ -408,39 +408,45 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
                DebugPrint("tagDeploymentDetections request failed - try Inactive cache")
                tagflight_df <- tagDeploymentDetections(tagDepID, config.EnableReadCache, config.InactiveCacheAgeLimitMinutes)
              }
-             #add the tag deployment release point data to the flight path dataset
-             #there has to be a better way but my R convert datetime to date skills arent up to it...
-             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - get release point from tag details"))
-             releasepoint_df<-tagdetails_df[c("started","species","lat","lon")]
-             my_date<-as_date(releasepoint_df$started)
-             my_site<-"Tagged"
-             my_lat = releasepoint_df$lat
-             my_lon = releasepoint_df$lon
-             my_receiverDeployment=0
-             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - add point to tagflight_df"))
-        
-             if(nrow(tagflight_df)<=0){ #the empty df
-               tagflight_df[nrow(tagflight_df),] <- data.frame(my_date, my_site, my_lat, my_lon,my_receiverDeployment)
-             } else { #normal df
-               tagflight_df[nrow(tagflight_df) + 1,] <- data.frame(my_date, my_site, my_lat, my_lon,my_receiverDeployment)
+
+             # apply any flight data exclusions from .csv file read by global.R
+             if( length(gblIgnoreDateTagReceiverDetections_df > 0 )){
+                for(i in 1:nrow(gblIgnoreDateTagReceiverDetections_df)) {
+                   row <- gblIgnoreDateTagReceiverDetections_df[i,]
+                   theDate=row[["date"]]
+                   theID=row[["receiverDeploymentID"]]
+                   theSite=row[["site"]]
+                   #print(paste0("exclude"," date:",theDate, "  id:", theID,"  site:", theSite))
+                   tagflight_df <- tagflight_df[!(tagflight_df$receiverDeploymentID == theID & tagflight_df$date == theDate),] 
+                }
              }
-
-             DebugPrint(paste0("input$mytable_rows_selected observeEvent() - sort tagflight_df"))
+             
+             #message("---  The final filtered summary flight df --------")
+             #print(tagflight_df)
+         
+             
+             #DebugPrint(paste0("input$mytable_rows_selected observeEvent() - sort tagflight_df"))
              #sort flight detection so most recent appears at bottom of the list
-             tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
+             # should already be sorted,....
+             #tagflight_df <- tagflight_df[ order(tagflight_df$date, decreasing = FALSE), ]
 
-       } #end if
+       } #end if else tagDepID is not na
 
         DebugPrint(paste0("input$mytable_rows_selected observeEvent() - render tagflight_df as table"))
-
-        output$flightpath <- DT::renderDataTable(tagflight_df,
-                                 selection = "single", 
-                                 options=list(dom = 'Bfrtip',
-                                 searching = F,
-                                "pageLength" = 18,
-                                language = list(zeroRecords = "No records to display - Motus.org possibly offline.")
-                                ) #end options
-        ) #end renderDataTable()
+        df<-tagflight_df[c("date", "site","lat" ,"lon","receiverDeploymentID")]
+        output$flightpath <- DT::renderDataTable({
+                          datatable( df,
+                                    selection = "single", 
+                                    options=list(dom = 'Bfrtip',
+                                                 searching = F,
+                                                 "pageLength" = 18,
+                                                 language = list(zeroRecords = "No records to display - Motus.org possibly offline.")
+                                    ) ) %>%  formatRound(columns=c("lat","lon"),digits=2) 
+       } ) #end renderDataTable
+        
+        
+        
+        
      
         #saveRDS(subset_df, file="subset.RDS")
         
@@ -491,7 +497,8 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
             stroke=FALSE,
             fillOpacity=0.5,
             #color=~color??, # color circle 
-            popup=label_text
+            popup=label_text,
+            label=tagflight_df$site
           ) %>%
           
           # OPTIONAL: for touchscreens: we add a 2nd set of markers that have bigger radius and 
@@ -503,7 +510,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
             radius=15,
             stroke=FALSE,
             fillOpacity=0.0,
-            popup=label_text
+            popup=label_text,label=tagflight_df$site
           ) %>%
           
           #now add the MovingMarker layer
@@ -512,7 +519,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
                           layerId="movingmarker",
                           duration=8000,
                           icon = birdIcon,
-                          label="",
+                          label=selected_species,
                           popup="")
         
         } # end else tagDepID is not null

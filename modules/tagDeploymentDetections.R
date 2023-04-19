@@ -75,9 +75,9 @@ rows = function(x) lapply(seq_len(nrow(x)), function(i) lapply(x,"[",i))
 
 empty_tagDeploymentDetection_df <- function()
 {
-  df <- data.frame( matrix( ncol = 5, nrow = 1) )
+  df <- data.frame( matrix( ncol = 7, nrow = 1) )
   df <- df %>% drop_na()
-  colnames(df) <- c('date', 'site', 'lat', 'lon', 'receiverDeploymentID')
+  colnames(df) <- c('date', 'site', 'lat', 'lon', 'receiverDeploymentID', 'seq', 'use')
   return (df)
 }
 
@@ -98,11 +98,11 @@ url <- paste( c('https://motus.org/data/tagDeploymentDetections?id=',tagDeployme
 cacheFilename = paste0(config.CachePath,"/tagDeploymentDetections_",tagDeploymentID,".Rda")
 
 
-df <-readCache(cacheFilename, useReadCache, cacheAgeLimitMinutes)   #see utility_functions.R
+summaryFlight_df <-readCache(cacheFilename, useReadCache, cacheAgeLimitMinutes)   #see utility_functions.R
 
-if( is.data.frame(df)){
+if( is.data.frame(summaryFlight_df)){
   DebugPrint("tagDeploymentDetections returning cached file")
-  return(df)
+  return(summaryFlight_df)
 } #else was NA
 
 #prepare an empty dataframe we can return if we encounter errors parsing query results
@@ -165,13 +165,6 @@ DebugPrint("end initial html result testing")
 
 # *************************************************************
 
-
-
-
-
-
-
-
 tbls <- page %>% html_nodes("table")
 
 ##print(length(tbls))
@@ -190,6 +183,8 @@ site<-c()
 lat<-c()
 lon<-c() 
 receiverDeploymentID<-c()
+seq<-c()
+use<-c()
 
 #> print(class(tbl1[[1]][i]))  
 #[1] "character"
@@ -213,16 +208,15 @@ if(hasFooter == 1){
 #for(i in 1:num.rows){
 n <- 0
 for(i in 1:nrecords){
-  n <- n+1
+  n<-n+1
+
   date <- c( date,  tbl1[[1]][i]  )
   site <- c( site,  tbl1[[2]][i] )
   lat <-  c( lat,  tbl1[[3]][i]  )
   lon <-  c( lon,  tbl1[[4]][i] )
+  seq <- c(seq,n)
+  use <- c(use,TRUE)
 }
-#print(date)
-#print(site)
-#print(lat)
-#print(lon)
 
 #convert strings to correct type
 date <- as.Date(date)
@@ -258,34 +252,107 @@ for (node in a_nodes) {
     #cat("n:",n," length:", length(receiverDeploymentID), "theId:",theID, "\n")
   }
 }
-#got them...
-#print(receiverDeploymentID)
 
-df <-data.frame(date,site,lat,lon,receiverDeploymentID)
+summaryFlight_df <-data.frame(date,site,lat,lon,receiverDeploymentID,seq,use)
 
-# flight data exclusions from .csv file read by global.R
-if( length(gblIgnoreDateTagReceiverDetections_df > 0 )){
+# obtain the track data with so we can correctly order the daily summary data
+# tagTrack_df <- tagTrack(tagDeploymentID, config.EnableReadCache, config.ActiveCacheAgeLimitMinutes)
+
+#dont read or write cache this df is a by product used to create
+#the summary flight df so if that cached product would be the same age
+#if we wrote this to cache... ie its redundant to cache this
+tagTrack_df <- tagTrack(tagDeploymentID, 0, 0) 
+
+# we need the correct receiverDeploymentID to support the ability to filter out
+# specific wild points detections in later steps.
+# Make a compact df of all unique sites from the tagTrack_df
+# for each distinct site, use the summaryFlight_df to lookup the receiverDeploymentID
+# using the site name and replace the dummy default receiver on the tagTrack_df 
+
+distinctSites_df<-tagTrack_df[!duplicated(tagTrack_df[ , c("site") ]),]
+if( length(distinctSites_df > 0 )){
+  for(i in 1:nrow(distinctSites_df)) {
+    row <- distinctSites_df[i,]
+    theDate=row[["date"]]
+    theID=row[["receiverDeploymentID"]]
+    theSite=row[["site"]]
+    
+    #search for a row in summary containing the target site name 
+    res <- subset(summaryFlight_df, site==theSite)
+    res <- subset(res, 
+                  subset = !duplicated(res[c("site", "receiverDeploymentID")]) )
+    #if found, use the receiverDeploymentID to overwrite the dummy default value
+    if(nrow(res==1)){
+      theReceiverDeploymentID<-res$receiverDeploymentID
+      tagTrack_df$receiverDeploymentID[ tagTrack_df$site == theSite] <- theReceiverDeploymentID
+    } #else site was not found on summaryFlight_df - ignore
+  } # end for each row
+} #endif length distinct sites
+
+#sort flight detection so most recent appears at bottom of the list
+tagTrack_df <- tagTrack_df[ order(tagTrack_df$usecs, decreasing = FALSE), ]
+
+# we are done with the original summary df
+# we build a new summaryFlight_df from time ordered df
+n<-0
+prior_doy<-0
+prior_rcvr<-9999
+options(digits=10)
+summaryFlight_df<-empty_tagDeploymentDetection_df()
+for (row in 1:nrow(tagTrack_df)) {
+  n<-n+1
+  theUsecs <- tagTrack_df[row, "usecs"]
+  date <- tagTrack_df[row, "date"]
+  site <- tagTrack_df[row, "site"]
+  lat <- tagTrack_df[row, "lat"]
+  lon <- tagTrack_df[row, "lon"]
+  receiverDeploymentID <- tagTrack_df[row, "receiverDeploymentID"]
+  use <- tagTrack_df[row, "use"]
+  # create a decimal yeaydoy+decimalday this will be our sort order field
+  yr <- as.numeric(strftime(date, format = "%Y"))
+  doy <- as.numeric(strftime(date, format = "%j"))
+  hr <- as.numeric(strftime(date, format = "%H"))
+  min <-as.numeric(strftime(date, format = "%M"))
+  sec <- as.numeric(strftime(date, format = "%S"))
+  x = yr*1000+doy+hr/24+min/1440+sec/86400
+  seq<-x  #overwrites seq from row data
   
-for(i in 1:nrow(gblIgnoreDateTagReceiverDetections_df)) {
-      row <- gblIgnoreDateTagReceiverDetections_df[i,]
-      theDate=row[[1]]
-      theID=row[[2]]
-      theSite=row[[3]]
-      
-      #print(paste0("exclude"," date:",theDate, "  id:", theID,"  site:", theSite))
-      df <- df[!(df$receiverDeploymentID == theID & df$date == theDate),] 
-   }
-}
-#print("***** final df ******")
-#print(df)
+  #now ready truncate the datetime to date part only
+  s<-strftime(date, format = "%Y-%m-%d")
+  date<-s
+  
+  #print(paste0("tagTrack flight doy:",doy, " date:",date,"  site:",site," lat:",lat," lon:",
+  #             lon," receiverDeploymentID:", receiverDeploymentID, " seq:", seq, " use:",use))
+  
+  # we want to build a new data frame only using only the first detection of an animal
+  # each day at any station
+  if( (doy == prior_doy) &  (receiverDeploymentID == prior_rcvr ) ){
+    use<-FALSE
+  } else { 
+    use<-TRUE
+    # create new frame and append 
+    a_df<-data.frame(date, site, lat, lon, receiverDeploymentID,seq,use)
+    summaryFlight_df[nrow(summaryFlight_df) + 1,] <- a_df
+    prior_doy = doy
+    prior_rcvr = receiverDeploymentID
+  }
+}  #end for each row
+summaryFlight_df[,'lat']=round(summaryFlight_df[,'lat'],2)
+summaryFlight_df[,'lon']=round(summaryFlight_df[,'lon'],2)
+
+#remove any other rows with 'use' field = FALSE
+summaryFlight_df <- summaryFlight_df[!(summaryFlight_df$use == FALSE),]
+
+#double check sort flight detection so most recent appears at bottom of the list
+summaryFlight_df <- summaryFlight_df[ order(summaryFlight_df$seq, decreasing = FALSE), ]
 
 #finally, delete any rows with nulls
-df <- df %>% drop_na()
+summaryFlight_df <- summaryFlight_df %>% drop_na()
 
 if(config.EnableWriteCache == 1){
   DebugPrint("writing new cache file.")
-  saveRDS(df,file=cacheFilename)
+  saveRDS(summaryFlight_df,file=cacheFilename)
 }
 DebugPrint("tagDeploymentDetections done.")
-return(df)
+return(summaryFlight_df)
 }

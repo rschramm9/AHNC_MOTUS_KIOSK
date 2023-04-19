@@ -44,7 +44,7 @@
 # Globals: libraries, modules etc.
 
 ############### Put github release version and data here ##########
-gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.6  17-Apr-2023"
+gblFooterText <- "USFWS Ankeny Hill Nature Center MOTUS Kiosk.  vsn 4.2.7  19-Apr-2023"
 ############### will be rendered into footer by server() ########## 
 
 
@@ -103,6 +103,7 @@ source("modules/receiverDeploymentDetections.R")  #whats been at our receiver
 source("modules/MotusNews.R")  #whats been at our receiver
 source("modules/receiverDeploymentDetails.R")
 source("modules/AboutMotus.R")  
+source("modules/tagTrack.R")  
 
      # read the configuration file (see configUtils.R)
      #print("global calling getConfig")
