@@ -385,6 +385,8 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
                         language = list(zeroRecords = "No records to display - Motus.org possibly offline.")
                         ) #end options
                         ) #end renderDataTable()
+          
+
         
            myLeafletMap = leaflet() %>% addTiles() #render the empty map
            output$leaflet_map = renderLeaflet(myLeafletMap) 
@@ -433,15 +435,17 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
        } #end if else tagDepID is not na
 
         DebugPrint(paste0("input$mytable_rows_selected observeEvent() - render tagflight_df as table"))
-        df<-tagflight_df[c("date", "site","lat" ,"lon","receiverDeploymentID")]
+        df<-tagflight_df[c("seq","date", "site","lat" ,"lon","receiverDeploymentID")]
         output$flightpath <- DT::renderDataTable({
                           datatable( df,
                                     selection = "single", 
+                                    rownames = FALSE,
                                     options=list(dom = 'Bfrtip',
                                                  searching = F,
                                                  "pageLength" = 18,
                                                  language = list(zeroRecords = "No records to display - Motus.org possibly offline.")
-                                    ) ) %>%  formatRound(columns=c("lat","lon"),digits=2) 
+                                    ) )  %>%  formatRound(columns=c("lat","lon"),digits=4)  
+          
        } ) #end renderDataTable
         
         

@@ -19,18 +19,23 @@ empty_tagTrack_df <- function()
 
 # returns if tagid not found:
 #  []
+# class json::list  length:0
+
 # normal returns like:
 #  [49.0588,-123.1421,"Brunswick Point farm",[1666625957,1666626091,1666821932],,"tagging site",[1666113180,1666113480]]
 
 # Returns for bad url https://motus.org/daxxta/json/track?tagDeploymentId=2343628
 #  <title>  Page not foundMotus Wildlife Tracking System</title>
 
+#https://motus.org/data/json/track?tagDeploymentId=44115
 
 tagTrack <- function(tagDeploymentID, useReadCache=0, cacheAgeLimitMinutes=60) 
 {
   
   url <- paste( c('https://motus.org/data/json/track?tagDeploymentId=',tagDeploymentID) ,collapse="")   
-  #message(url)
+  
+  #url<-"https://motus.org/data/json/track?tagDeploymentId=944115"
+  message(url)
   
   cacheFilename = paste0(config.CachePath,"/tagTrack_",tagDeploymentID,".Rda")
   
@@ -51,51 +56,19 @@ tagTrack <- function(tagDeploymentID, useReadCache=0, cacheAgeLimitMinutes=60)
   
   json <- rjson::fromJSON(file=url)
   
-  #print("************ printing class of json ****************")
-  #print( paste0("class json:", class(json)))
- # print(paste0("length:",length(json)))
- # print(paste0("nrow:", nrow(json)))
-  
-  
-  #if( is.na(json)){
-  #  DebugPrint("fromJSON() no results - returning empty df (is.na(result) ***")
-  #  return(onError_df)
-  #}
-  
-  
-  
-#  print("************ printing json ****************")
-#  print(json)
-  
-  
-  
-#  print("************ str json ****************")
-#  str(json)
-  
-  #   print("************1 lat ****************")
-  #   print(json[[1]])
-  #   print("************2 lon ****************")
-  #   print(json[[2]])
-  #   print("************3 site ****************")
-  #   print(json[[3]])
-  #   print("************4 times ****************")
-  #   print(json[[4]])
-  
- # print("**************now the for loop ****************")
-  
-#  for (i in seq( 1, length(json), 4) ) {
-#    print(paste0("INDEX:***************** ",i, " ******************************") )
-#    #print(paste0("lat:", json[[i]], " lon:",json[[i+1]] ," site:",json[[i+2]], " usecs:",json[[i+3]] ))
-#    print("************ lat ****************")
-#    print(json[[i]])
-#    print("************ lon ****************")
-#    print(json[[i+1]])
-#    print("************ site ****************")
-#    print(json[[i+2]])
-#    print("************ times ****************")
-#    print(json[[i+3]])
-#  }
-  
+  if( !is.list(json)){
+    ErrorPrint(paste("No json list object returned from url:",url))
+    message("returning onError df")
+    return(onError_df)           
+  }
+
+  l=length(json)
+  if(l <= 0){
+    ErrorPrint(paste("Empty json list object returned from url:",url))
+    message("returning onError df")
+    return(onError_df)           
+  }
+
   # create five empty 'vectors'
   usecs<-c()
   date<-c()
@@ -106,51 +79,28 @@ tagTrack <- function(tagDeploymentID, useReadCache=0, cacheAgeLimitMinutes=60)
   seq<-c()
   use<-c()
   n<-0
-  
-  
-  #print(paste0("usecs, date, site, lat, lon"  ))
- 
-    for (i in seq( 1, length(json), 4) ) {
-    #print(paste0("INDEX:***************** ",i, " ******************************") )
-    #print(paste0("lat:", json[[i]], " lon:",json[[i+1]] ," site:",json[[i+2]], " usecs:",json[[i+3]] ))
+
+  for (i in seq( 1, length(json), 4) ) {
 
     for(j in seq(1,length(json[[i+3]]),1 )){
       the_lat<-json[[i]]
       the_lon<-json[[i+1]]
       the_site <- json[[i+2]]
       the_usecs <- json[[i+3]][[j]]
-      #print(paste0("lat:",json[[i]]," lon:",json[[i+1]]," site:",json[[i+2]]," times:",json[[i+3]][[j]]))
-      #print(paste0("lat:",json[[i]]," lon:",json[[i+1]]," site:",json[[i+2]]," times:",usecs))
-      
       the_date <- as.POSIXct(as.numeric(the_usecs), origin = '1970-01-01', tz = 'GMT')
-      #GOOD print(paste0("lat:",json[[i]]," lon:",json[[i+1]]," site:",json[[i+2]]," usecs:",usecs," datetime:",gmt))
-     
-    
-      
-      #print(paste0("lat:",json[[i]]," lon:",json[[i+1]]," site:",json[[i+2]]," usecs:",usecs," datetime:",gmt))
-      #print(paste0(the_usecs, ", ", the_date, ", ", the_site, ", " , the_lat, ", ", the_lon  ))
+
       usecs <- c( usecs, the_usecs )
       date <- c( date, as.character(the_date ))
       site <- c( site, the_site )
       lat <-  c( lat, the_lat  )
       lon <-  c( lon, the_lon )
-      
       receiverDeploymentID<-c(receiverDeploymentID,0) #0=default 
       n<-n+1
       seq<-c(seq,n)
       use<-c(use,TRUE)
-    }
-    
-    #   print("************ lat ****************")
-    # print(json[[i]])
-    # print("************ lon ****************")
-    # print(json[[i+1]])
-    # print("************ site ****************")
-    # print(json[[i+2]])
-    # print("************ times ****************")
-    # print(json[[i+3]])
-    
-    }
+    } #end for j
+  
+  } #end for i
   
     df <-data.frame(usecs,date,site,lat,lon, receiverDeploymentID,seq,use)
   

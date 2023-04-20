@@ -291,16 +291,19 @@ if( length(distinctSites_df > 0 )){
 
 #sort flight detection so most recent appears at bottom of the list
 tagTrack_df <- tagTrack_df[ order(tagTrack_df$usecs, decreasing = FALSE), ]
+# print(tagTrack_df)
 
 # we are done with the original summary df
-# we build a new summaryFlight_df from time ordered df
+# we build a new summaryFlight_df from time ordered df sequence number
 n<-0
 prior_doy<-0
 prior_rcvr<-9999
-options(digits=10)
-summaryFlight_df<-empty_tagDeploymentDetection_df()
-for (row in 1:nrow(tagTrack_df)) {
-  n<-n+1
+
+if( nrow(tagTrack_df) >= 1 ){
+  summaryFlight_df<-empty_tagDeploymentDetection_df() #zero it our so we can rebuild it
+  
+  for (row in 1:nrow(tagTrack_df)) {
+  seq <- n #overwrites seq from raw dataframe
   theUsecs <- tagTrack_df[row, "usecs"]
   date <- tagTrack_df[row, "date"]
   site <- tagTrack_df[row, "site"]
@@ -308,37 +311,29 @@ for (row in 1:nrow(tagTrack_df)) {
   lon <- tagTrack_df[row, "lon"]
   receiverDeploymentID <- tagTrack_df[row, "receiverDeploymentID"]
   use <- tagTrack_df[row, "use"]
-  # create a decimal yeaydoy+decimalday this will be our sort order field
   yr <- as.numeric(strftime(date, format = "%Y"))
   doy <- as.numeric(strftime(date, format = "%j"))
-  hr <- as.numeric(strftime(date, format = "%H"))
-  min <-as.numeric(strftime(date, format = "%M"))
-  sec <- as.numeric(strftime(date, format = "%S"))
-  x = yr*1000+doy+hr/24+min/1440+sec/86400
-  seq<-x  #overwrites seq from row data
-  
   #now ready truncate the datetime to date part only
   s<-strftime(date, format = "%Y-%m-%d")
   date<-s
-  
-  #print(paste0("tagTrack flight doy:",doy, " date:",date,"  site:",site," lat:",lat," lon:",
-  #             lon," receiverDeploymentID:", receiverDeploymentID, " seq:", seq, " use:",use))
-  
-  # we want to build a new data frame only using only the first detection of an animal
-  # each day at any station
+
+  # we want to build a new data frame only using only the first detection of
+  # tag + day + station (with new sequence number)
   if( (doy == prior_doy) &  (receiverDeploymentID == prior_rcvr ) ){
     use<-FALSE
   } else { 
     use<-TRUE
     # create new frame and append 
+    n<-n+1
+    seq<-n
     a_df<-data.frame(date, site, lat, lon, receiverDeploymentID,seq,use)
     summaryFlight_df[nrow(summaryFlight_df) + 1,] <- a_df
     prior_doy = doy
     prior_rcvr = receiverDeploymentID
   }
 }  #end for each row
-summaryFlight_df[,'lat']=round(summaryFlight_df[,'lat'],2)
-summaryFlight_df[,'lon']=round(summaryFlight_df[,'lon'],2)
+
+} #endif nrows(tagTrack_df)>0
 
 #remove any other rows with 'use' field = FALSE
 summaryFlight_df <- summaryFlight_df[!(summaryFlight_df$use == FALSE),]
@@ -354,5 +349,9 @@ if(config.EnableWriteCache == 1){
   saveRDS(summaryFlight_df,file=cacheFilename)
 }
 DebugPrint("tagDeploymentDetections done.")
+
+#message("finished flight summary")
+#print(summaryFlight_df)
+
 return(summaryFlight_df)
 }
