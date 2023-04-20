@@ -128,6 +128,7 @@ Note R may ask you to select a mirror site - Use one physically close to you. I 
     install.packages("stringr")
     install.packages("xml2")
     install.packages("sf")
+    install.packages("rjson")
 
 ##### 4.0 - Create the MOTUS_KIOSK user account
 
