@@ -54,20 +54,14 @@ UI_ReceiverDetections <- function(id, i18n) {
     ),
     
       titlePanel(
-        div(
          span(
+           div(
+            textOutput("table_title"),
             i18n$t("ui_RCVR_title"), 
             style="color:#8FBC8F;font-style: italic;font-size: 25px; background-color:white",
-            
-            ### enable this span block if you want the ui button to "Requery Motus"
-            # span(
-            # actionButton(ns("btnQuery"),i18n$t("ui_RCVR_input_requery_button_caption"),
-            #        style="position:absolute;left:350px;",
-            #        ),
-            # ) # end span2
-         ) # end span1
-      ) #end div
-      
+
+          ) #end div
+        ) # end span1
       ), #end titlepanel
     
     #), #end fluid row
@@ -521,7 +515,7 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
           addMovingMarker(data = flight_sf,
                           movingOptions = movingMarkerOptions(autostart = TRUE, loop = FALSE),
                           layerId="movingmarker",
-                          duration=8000,
+                          duration=7000,  #8000=8seconds
                           icon = birdIcon,
                           label=selected_species,
                           popup="")
@@ -559,6 +553,10 @@ SERVER_ReceiverDetections <- function(id, i18n_r, lang, rcvr) {
       DebugPrint(paste0("recvr picker observerEvent receiverDeploymentID", receiverDeploymentID))
       myTagsToTable()
       DebugPrint("recvr picker observerEvent back from tags to table")
+      
+      
+      message(paste("set rcvr title to:",strReceiverShortName ))
+      output$table_title<-renderText({strReceiverShortName})
       
     })  #end observeEvent input$receiver_pick
   

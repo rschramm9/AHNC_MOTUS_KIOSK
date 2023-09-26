@@ -198,8 +198,12 @@ ui_titlebar <- fluidRow(
 ## assemble the UI from the pieces
 ###############################################################################
 ui <- fluidPage( 
-  tags$head(  tags$script(src="var_change.js")),
-  tags$script(inactivity),
+  ##tags$head( HTML("<title>Motus Kiosk</title>"),
+             
+             tags$head( 
+             tags$title("Motus Kiosk"),
+             tags$script(src="var_change.js")),
+             tags$script(inactivity),
 
   ui_titlebar,
   ui_navbar,

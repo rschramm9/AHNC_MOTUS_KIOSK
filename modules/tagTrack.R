@@ -33,6 +33,7 @@ tagTrack <- function(tagDeploymentID, useReadCache=0, cacheAgeLimitMinutes=60)
 {
   
   url <- paste( c('https://motus.org/data/json/track?tagDeploymentId=',tagDeploymentID) ,collapse="")   
+  ##url <- "https://motus.org/data/json/track?tagDeploymentId=45113"
   
   #url<-"https://motus.org/data/json/track?tagDeploymentId=944115"
   message(url)
@@ -106,11 +107,12 @@ tagTrack <- function(tagDeploymentID, useReadCache=0, cacheAgeLimitMinutes=60)
   
     #finally, delete any rows with nulls
     df <- df %>% drop_na()
-    
+
     if(config.EnableWriteCache == 1){
       DebugPrint("writing new cache file.")
       saveRDS(df,file=cacheFilename)
     }
     DebugPrint("tagDeploymentDetections done.")
+    
     return(df)
 }

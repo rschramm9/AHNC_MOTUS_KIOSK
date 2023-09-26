@@ -27,9 +27,11 @@ source("modules/configUtils.R")
 source("modules/utility_functions.R")
 
 source("modules/tagDeploymentDetails.R")      
-source("modules/tagDeploymentDetections.R")    
+source("modules/tagDeploymentDetections.R") 
+source("modules/tagTrack.R")
 source("modules/receiverDeploymentDetections.R")
 source("modules/receiverDeploymentDetails.R")
+
 
 LOG_LEVEL<<-4 #WARNING
 

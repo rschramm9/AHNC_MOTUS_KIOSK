@@ -291,7 +291,10 @@ if( length(distinctSites_df > 0 )){
 
 #sort flight detection so most recent appears at bottom of the list
 tagTrack_df <- tagTrack_df[ order(tagTrack_df$usecs, decreasing = FALSE), ]
-# print(tagTrack_df)
+
+#options(max.print=1000000)
+#print(tagTrack_df)
+
 
 # we are done with the original summary df
 # we build a new summaryFlight_df from time ordered df sequence number
