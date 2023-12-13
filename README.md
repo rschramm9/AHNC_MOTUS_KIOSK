@@ -1,4 +1,8 @@
-# AHNC_MOTUS_KIOSK
+# AHNC_MOTUS_KIOSK (Obsolete as of 12December2023)
+# Current repo MOTUS_KIOSK at https://github.com/rschramm9/MOTUS_KIOSK
+
+## this repo is being preserved as others may have need of it
+
 ## Ankeny Hill Nature Center MOTUS Kiosk System
 
 This project creates a public display or "kiosk"" for a Motus receiver station for the US Fish and Wildlife Service (USFWS) Ankeny Hill Nature Center.  The goal is to engage public visitors to the site with a simple near-realtime display of migratory bird tag detection events. It presents a very simple limited number of screens that are easy to navigate via a touchscreen display.
